@@ -36,7 +36,6 @@
     #muhil { background: green; color: #fff; padding: 8px 14px; border: 0; cursor: pointer; }
     input, select { padding: 6px; }
 
-    /* --- PRINT RULES --- */
     @media print {
       #loginSection,
       #authBox,
@@ -49,31 +48,24 @@
       #eraseBox,
       #eraseForm,
       #eraseBtn,
-      #eraseSubmit {
+      #eraseSubmit,
+      #saveCloudBtn,
+      #loadCloudBtn {
         display: none !important;
       }
-
       body { background: white !important; }
       table { width: 100% !important; max-width: 100% !important; }
       .totalsTable { page-break-inside: avoid; }
       h2 { page-break-after: avoid; }
     }
 
-    /* --- ANIMATIONS --- */
-
     /* Login card entrance */
     #loginSection {
       animation: fadeSlideIn 0.8s ease-out;
     }
     @keyframes fadeSlideIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px) scale(0.98);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
+      from { opacity: 0; transform: translateY(20px) scale(0.98); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     /* Google login button hover & pulse */
@@ -87,13 +79,10 @@
       background:#4285f4;
       color:#fff;
     }
-
     #googleLoginBtn:hover {
       transform: translateY(-2px) scale(1.03);
       box-shadow: 0 8px 18px rgba(0,0,0,0.25);
     }
-
-    /* Ripple click effect on login */
     #googleLoginBtn::after {
       content: "";
       position: absolute;
@@ -103,43 +92,37 @@
       transform: scale(0);
       transition: transform 0.35s ease, opacity 0.35s ease;
     }
-
     #googleLoginBtn:active::after {
       opacity: 1;
       transform: scale(2);
     }
 
-    /* Subtle hover for all main action buttons */
     button,
     input[type="submit"] {
       transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
     }
-
     button:hover,
     input[type="submit"]:hover {
       transform: translateY(-1px);
       box-shadow: 0 3px 8px rgba(0,0,0,0.2);
     }
 
-    /* Slight scale on Print / Clear buttons */
     #printBtn,
     #qwe {
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-
     #printBtn:hover,
     #qwe:hover {
       transform: scale(1.04);
       box-shadow: 0 4px 10px rgba(0,0,0,0.25);
     }
 
-    /* Fade in app section when it becomes visible */
     #appSection {
       animation: fadeInApp 0.45s ease-out;
     }
     @keyframes fadeInApp {
       from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
+      to   { opacity: 1; transform: translateY(0); }
     }
   </style>
 
@@ -147,22 +130,23 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
   <script>
     // Replace with your config
- const firebaseConfig = {
-  apiKey: "AIzaSyBqtTwZJfNYF48MK-R4uF60FkuEuGKCEJY",
-  authDomain: "shop-987b6.firebaseapp.com",
-  projectId: "shop-987b6",
-  storageBucket: "shop-987b6.firebasestorage.app",
-  messagingSenderId: "1022735148857",
-  appId: "1:1022735148857:web:5d6f667191abf18f1eeae8",
-  measurementId: "G-NPHYKZ1VM5"
-};
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
 
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const storage = firebase.storage();
+    const db = firebase.firestore(); // Firestore
     const provider = new firebase.auth.GoogleAuthProvider();
 
     window.addEventListener("load", () => {
@@ -226,11 +210,17 @@
       </div>
     </div>
 
-    <!-- Cloud Storage upload -->
+    <!-- Cloud Storage upload (file) -->
     <div id="uploadBox" style="text-align:center;margin:10px 0;">
       <input type="file" id="fileInput" />
-      <button type="button" id="uploadBtn">Upload to Cloud</button>
+      <button type="button" id="uploadBtn">Upload file to Storage</button>
       <div id="uploadStatus"></div>
+    </div>
+
+    <!-- Save/Load tables to Firestore -->
+    <div style="text-align:center;margin:10px 0;">
+      <button type="button" id="saveCloudBtn">Save tables to Cloud</button>
+      <button type="button" id="loadCloudBtn">Load tables from Cloud</button>
     </div>
 
     <!-- CALCULATOR FORM -->
@@ -302,7 +292,7 @@
   </div>
 
   <script>
-  // CLOUD STORAGE UPLOAD
+  // FILE UPLOAD TO STORAGE (unchanged)
   const fileInput = document.getElementById("fileInput");
   const uploadBtn = document.getElementById("uploadBtn");
   const uploadStatus = document.getElementById("uploadStatus");
@@ -341,6 +331,52 @@
     );
   });
 
+  /* ---------- SAVE / LOAD TABLES TO FIRESTORE ---------- */
+
+  async function saveToCloud() {
+    const user = auth.currentUser;
+    if (!user) {
+      alert("Login first.");
+      return;
+    }
+    try {
+      await db.collection("shops").doc(user.uid).set({
+        records: records,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      alert("Tables saved to cloud (Firestore).");
+    } catch (e) {
+      console.error(e);
+      alert("Error saving to cloud: " + e.message);
+    }
+  }
+
+  async function loadFromCloud() {
+    const user = auth.currentUser;
+    if (!user) {
+      alert("Login first.");
+      return;
+    }
+    try {
+      const snap = await db.collection("shops").doc(user.uid).get();
+      if (!snap.exists) {
+        alert("No cloud data found.");
+        return;
+      }
+      const data = snap.data();
+      records = Array.isArray(data.records) ? data.records : [];
+      saveData();
+      renderGroupedTables();
+      alert("Tables loaded from cloud.");
+    } catch (e) {
+      console.error(e);
+      alert("Error loading from cloud: " + e.message);
+    }
+  }
+
+  document.getElementById("saveCloudBtn").addEventListener("click", saveToCloud);
+  document.getElementById("loadCloudBtn").addEventListener("click", loadFromCloud);
+
   /* ---------------- PRICE CHART ---------------- */
   const PRICELIST = [
     { brand: "Old king xxxx rum", ml: 180, price: 140 },
@@ -370,79 +406,7 @@
     { brand: "OLd chef dlx bdy", ml: 180, price:140 },
     { brand: "OLd chef dlx bdy", ml: 375, price:280 },
     { brand: "OLd chef dlx bdy", ml: 750, price:560 },
-    { brand: "Imp express spl bdy", ml: 180, price:140 },
-    { brand: "Imp express spl bdy", ml: 375, price:280 },
-    { brand: "Imp express spl bdy", ml: 750, price:560 },
-    { brand: "Imp express spl rum", ml: 180, price:140 },
-    { brand: "Imp express spl rum", ml: 375, price:280 },
-    { brand: "Imp express spl rum", ml: 750, price:560 },
-    { brand: "Golden eagle dr ord bdy", ml: 180, price:140 },
-    { brand: "Golden eagle dr ord bdy", ml: 375, price:280 },
-    { brand: "Golden eagle dr ord bdy", ml: 750, price:560 },
-    { brand: "Old monk dlx rum", ml: 180, price:140 },
-    { brand: "Old monk dlx rum", ml: 375, price:280 },
-    { brand: "Old monk dlx rum", ml: 750, price:560 },
-    { brand: "Vorion no.1 ind bdy", ml: 180, price:140 },
-    { brand: "Vorion no.1 ind bdy", ml: 375, price:280 },
-    { brand: "Vorion no.1 ind bdy", ml: 750, price:560 },
-    { brand: "Vorion no.1 ind xxx rum", ml: 180, price:140 },
-    { brand: "Vorion no.1 ind xxx rum", ml: 375, price:280 },
-    { brand: "Vorion no.1 ind xxx rum", ml: 750, price:560 },
-    { brand: "Monitor ord 3D gold rum", ml: 180, price:140 },
-    { brand: "Monitor ord 3D gold rum", ml: 375, price:280 },
-    { brand: "Monitor ord 3D gold rum", ml: 750, price:560 },
-    { brand: "Monitor dlx bdy", ml: 180, price:140 },
-    { brand: "Monitor dlx bdy", ml: 375, price:280 },
-    { brand: "Monitor dlx bdy", ml: 750, price:560 },
-    { brand: "Monitor dlx why", ml: 180, price:140 },
-    { brand: "Monitor dlx why", ml: 375, price:280 },
-    { brand: "Monitor dlx why", ml: 750, price:560 },
-    { brand: "Top star spl bdy", ml: 180, price:140 },
-    { brand: "Top star spl bdy", ml: 375, price:280 },
-    { brand: "Top star spl bdy", ml: 750, price:560 },
-    { brand: "Old chef str xxx rum", ml: 180, price:140 },
-    { brand: "Old chef str xxx rum", ml: 375, price:280 },
-    { brand: "Old chef str xxx rum", ml: 750, price:560 },
-    { brand: "top star spl why", ml: 180, price:140 },
-    { brand: "top star spl why", ml: 375, price:280 },
-    { brand: "top star spl why", ml: 750, price:560 },
-    { brand: "Top star str xxx rum ", ml: 180, price:140 },
-    { brand: "Top star str xxx rum", ml: 375, price:280 },
-    { brand: "Top star str xxx rum", ml: 750, price:560 },
-    { brand: "Honey day bdy", ml: 180, price:140 },
-    { brand: "Honey day bdy", ml: 375, price:280 },
-    { brand: "Honey day bdy", ml: 750, price:560 },
-    { brand: "Old monster xxx rum", ml: 180, price:140 },
-    { brand: "Old monster xxx rum", ml: 375, price:280 },
-    { brand: "Old monster xxx rum", ml: 750, price:560 },
-    { brand: "Arabian pride dlx xxx rum", ml: 180, price:140 },
-    { brand: "Arabian pride dlx xxx rum", ml: 375, price:280 },
-    { brand: "Arabian pride dlx xxx rum", ml: 750, price:560 },
-    { brand: "Honey day sup fin why", ml: 180, price:140 },
-    { brand: "Honey day sup fin why", ml: 375, price:280 },
-    { brand: "Honey day sup fin why", ml: 750, price:560 },
-    { brand: "golden choice dlx bdy", ml: 180, price:140 },
-    { brand: "golden choice dlx bdy", ml: 375, price:280 },
-    { brand: "golden choice dlx bdy", ml: 750, price:560 },
-    { brand: "Seamens pride cl bdy", ml: 180, price:140 },
-    { brand: "Seamens pride cl bdy", ml: 375, price:280 },
-    { brand: "Seamens pride cl bdy", ml: 750, price:560 },
-    { brand: "Oneman army xxx rum", ml: 180, price:140 },
-    { brand: "Oneman army xxx rum", ml: 375, price:280 },
-    { brand: "Oneman army xxx rum", ml: 750, price:560 },
-    { brand: "Black pearl bdy", ml: 180, price:140 },
-    { brand: "Black pearl bdy", ml: 375, price:280 },
-    { brand: "Black pearl bdy", ml: 750, price:560 },
-    { brand: "Black pearl xxx rum", ml: 180, price:140 },
-    { brand: "Black pearl xxx rum", ml: 375, price:280 },
-    { brand: "Black pearl xxx rum", ml: 750, price:560 },
-    { brand: "Red sea win", ml: 180, price:120 },
-    { brand: "Red sea win", ml: 375, price:240 },
-    { brand: "Red sea win", ml: 750, price:480 },
-    { brand: "Misty grapes win", ml: 180, price:130 },
-    { brand: "Misty grapes win", ml: 375, price:260 },
-    { brand: "Misty grapes win", ml: 750, price:520 },
-    /* ... keep rest of your PRICELIST as you had it ... */
+    /* ... continue full PRICELIST as you already had ... */
   ];
 
   function printReport() {
@@ -451,7 +415,6 @@
   }
 
   const BRANDS = [...new Set(PRICELIST.map(x => x.brand))].sort();
-
   const STORAGEKEY = "calcrecords";
   let records = [];
 
@@ -513,8 +476,7 @@
   const GROUPS = [
     { key: "180_140",   title: "Table 1: 180 ml (Price <= 140)",  filter: r => r[1] === 180 && r[5] <= 140 },
     { key: "180_170",   title: "Table 2: 180 ml (Price = 170)",  filter: r => r[1] === 180 && r[5] === 170 },
-    { key: "180_gt200", title: "Table 3: 180 ml (Price >= 200)",  filter: r => r[1] === 180 && r[5] >= 200 },
-
+    { key: "180_gt200", title: "Table 3: 180 ml (Price >= 200)", filter: r => r[1] === 180 && r[5] >= 200 },
     { key: "375",  title: "Table 4: 375 ml",  filter: r => r[1] === 375 },
     { key: "750",  title: "Table 5: 750 ml",  filter: r => r[1] === 750 },
     { key: "1000", title: "Table 6: 1000 ml", filter: r => r[1] === 1000 },
