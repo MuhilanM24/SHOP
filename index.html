@@ -50,7 +50,8 @@
       #eraseBtn,
       #eraseSubmit,
       #saveCloudBtn,
-      #loadCloudBtn {
+      #loadCloudBtn,
+      #uploadBox {
         display: none !important;
       }
       body { background: white !important; }
@@ -147,7 +148,7 @@ const firebaseConfig = {
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const storage = firebase.storage();
-    const db = firebase.firestore(); // Firestore
+    const db = firebase.firestore();
     const provider = new firebase.auth.GoogleAuthProvider();
 
     window.addEventListener("load", () => {
@@ -293,7 +294,7 @@ const firebaseConfig = {
   </div>
 
   <script>
-  // FILE UPLOAD TO STORAGE (unchanged)
+  // FILE UPLOAD TO STORAGE
   const fileInput = document.getElementById("fileInput");
   const uploadBtn = document.getElementById("uploadBtn");
   const uploadStatus = document.getElementById("uploadStatus");
@@ -332,7 +333,7 @@ const firebaseConfig = {
     );
   });
 
-  /* ---------- SAVE / LOAD TABLES TO FIRESTORE ---------- */
+  /* ---------- SAVE / LOAD TABLES TO FIRESTORE (no nested arrays) ---------- */
 
   async function saveToCloud() {
     const user = auth.currentUser;
@@ -340,9 +341,22 @@ const firebaseConfig = {
       alert("Login first.");
       return;
     }
+
+    // Convert 2D array -> array of objects
+    const recordsForFirestore = records.map(r => ({
+      brand: r[0],
+      ml: r[1],
+      ob: r[2],
+      cb: r[3],
+      sales: r[4],
+      price: r[5],
+      sv: r[6],
+      cbv: r[7]
+    }));
+
     try {
       await db.collection("shops").doc(user.uid).set({
-        records: records,
+        records: recordsForFirestore,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
       alert("Tables saved to cloud (Firestore).");
@@ -365,7 +379,20 @@ const firebaseConfig = {
         return;
       }
       const data = snap.data();
-      records = Array.isArray(data.records) ? data.records : [];
+      const arr = Array.isArray(data.records) ? data.records : [];
+
+      // Convert array of objects -> 2D array
+      records = arr.map(o => ([
+        o.brand,
+        o.ml,
+        o.ob,
+        o.cb,
+        o.sales,
+        o.price,
+        o.sv,
+        o.cbv
+      ]));
+
       saveData();
       renderGroupedTables();
       alert("Tables loaded from cloud.");
@@ -407,7 +434,7 @@ const firebaseConfig = {
     { brand: "OLd chef dlx bdy", ml: 180, price:140 },
     { brand: "OLd chef dlx bdy", ml: 375, price:280 },
     { brand: "OLd chef dlx bdy", ml: 750, price:560 },
-    /* ... continue full PRICELIST as you already had ... */
+    /* continue with your full list here */
   ];
 
   function printReport() {
