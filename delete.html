@@ -1,0 +1,936 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SHOP 2605 – Login + Calculator</title>
+
+  <style>
+    body { background: aquamarine; font-family: Arial, sans-serif; }
+    h1 { text-align: center; margin-top: 10px; }
+    form {
+      background: rgb(191, 183, 187);
+      text-align: center;
+      padding: 15px 18px;
+      margin: 10px auto;
+      width: fit-content;
+      border-radius: 10px;
+    }
+    table {
+      background: antiquewhite;
+      margin: 12px auto;
+      border-collapse: collapse;
+      width: 95%;
+      max-width: 1100px;
+    }
+    th, td { border: 1px solid #333; padding: 6px 10px; }
+    th { background: #f1e2c6; }
+    .groupTitle { text-align: center; margin: 18px 0 6px; }
+    .totalsTable {
+      width: 95%;
+      max-width: 1100px;
+      margin: 0 auto 18px;
+      background: yellow;
+      font-weight: bold;
+    }
+    #qwe { background: red; color: #fff; padding: 8px 14px; border: 0; cursor: pointer; }
+    #muhil { background: green; color: #fff; padding: 8px 14px; border: 0; cursor: pointer; }
+    input, select { padding: 6px; }
+
+    /* --- PRINT RULES --- */
+    @media print {
+      #loginSection,
+      #authBox,
+      form,
+      #printBtn,
+      #muhil,
+      #qwe,
+      .muhil,
+      .qwe,
+      #eraseBox,
+      #eraseForm,
+      #eraseBtn,
+      #eraseSubmit {
+        display: none !important;
+      }
+
+      body { background: white !important; }
+      table { width: 100% !important; max-width: 100% !important; }
+      .totalsTable { page-break-inside: avoid; }
+      h2 { page-break-after: avoid; }
+    }
+
+    /* --- ANIMATIONS --- */
+
+    /* Login card entrance */
+    #loginSection {
+      animation: fadeSlideIn 0.8s ease-out;
+    }
+    @keyframes fadeSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* Google login button hover & pulse */
+    #googleLoginBtn {
+      position: relative;
+      overflow: hidden;
+      border-radius: 999px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      border: none;
+      background:#4285f4;
+      color:#fff;
+    }
+
+    #googleLoginBtn:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.25);
+    }
+
+    /* Ripple click effect on login */
+    #googleLoginBtn::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle, rgba(255,255,255,0.4) 10%, transparent 40%);
+      opacity: 0;
+      transform: scale(0);
+      transition: transform 0.35s ease, opacity 0.35s ease;
+    }
+
+    #googleLoginBtn:active::after {
+      opacity: 1;
+      transform: scale(2);
+    }
+
+    /* Subtle hover for all main action buttons */
+    button,
+    input[type="submit"] {
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+    }
+
+    button:hover,
+    input[type="submit"]:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    }
+
+    /* Slight scale on Print / Clear buttons */
+    #printBtn,
+    #qwe {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    #printBtn:hover,
+    #qwe:hover {
+      transform: scale(1.04);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    }
+
+    /* Fade in app section when it becomes visible */
+    #appSection {
+      animation: fadeInApp 0.45s ease-out;
+    }
+    @keyframes fadeInApp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+
+  <script>
+    // Replace with your config
+ const firebaseConfig = {
+  apiKey: "AIzaSyBqtTwZJfNYF48MK-R4uF60FkuEuGKCEJY",
+  authDomain: "shop-987b6.firebaseapp.com",
+  projectId: "shop-987b6",
+  storageBucket: "shop-987b6.firebasestorage.app",
+  messagingSenderId: "1022735148857",
+  appId: "1:1022735148857:web:5d6f667191abf18f1eeae8",
+  measurementId: "G-NPHYKZ1VM5"
+};
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const storage = firebase.storage();
+    const provider = new firebase.auth.GoogleAuthProvider();
+
+    window.addEventListener("load", () => {
+      const loginSection = document.getElementById("loginSection");
+      const appSection = document.getElementById("appSection");
+      const userEmailSpan = document.getElementById("userEmail");
+
+      appSection.style.display = "none";
+      loginSection.style.display = "block";
+
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          userEmailSpan.textContent = user.email;
+          loginSection.style.display = "none";
+          appSection.style.display = "block";
+        } else {
+          userEmailSpan.textContent = "";
+          loginSection.style.display = "block";
+          appSection.style.display = "none";
+        }
+      });
+
+      document.getElementById("googleLoginBtn").addEventListener("click", () => {
+        auth.signInWithPopup(provider).catch(err => {
+          alert("Login failed: " + err.message);
+        });
+      });
+
+      document.getElementById("logoutBtn").addEventListener("click", () => {
+        auth.signOut();
+      });
+    });
+  </script>
+</head>
+
+<body>
+  <h1>SHOP NO:2605</h1>
+
+  <!-- LOGIN SECTION -->
+  <div id="loginSection" style="
+    text-align:center;
+    margin:40px auto;
+    max-width:320px;
+    padding:24px 20px;
+    background: rgba(255,255,255,0.85);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  ">
+    <h2>Please login with Google</h2>
+    <button id="googleLoginBtn" style="padding:10px 24px;font-size:16px;">
+      Login with Google
+    </button>
+  </div>
+
+  <!-- APP SECTION -->
+  <div id="appSection" style="display:none;">
+    <div id="authBox" style="text-align:center;margin:10px 0;">
+      <div>
+        Logged in as: <span id="userEmail"></span>
+        <button id="logoutBtn" type="button">Logout</button>
+      </div>
+    </div>
+
+    <!-- Cloud Storage upload -->
+    <div id="uploadBox" style="text-align:center;margin:10px 0;">
+      <input type="file" id="fileInput" />
+      <button type="button" id="uploadBtn">Upload to Cloud</button>
+      <div id="uploadStatus"></div>
+    </div>
+
+    <!-- CALCULATOR FORM -->
+    <form id="information">
+      <label for="brand">Brand name</label>
+      <input type="text" id="brand" placeholder="Type brand name..." autocomplete="off" />
+      <datalist id="suggestions"></datalist>
+
+      <br><br>
+
+      <label for="ml">ML</label>
+      <select id="ml" name="ml">
+        <option value="">select</option>
+        <option value="180">180 ml</option>
+        <option value="325">325 ml</option>
+        <option value="375">375 ml</option>
+        <option value="500">500 ml</option>
+        <option value="650">650 ml</option>
+        <option value="750">750 ml</option>
+        <option value="1000">1000 ml</option>
+      </select>
+
+      <br><br>
+
+      <label for="ob">Enter opening balance</label>
+      <input type="number" id="ob" name="ob" placeholder="Enter the number" />
+
+      <br><br>
+
+      <label for="cb">Enter closing balance</label>
+      <input type="number" id="cb" name="cb" placeholder="Enter the number" />
+
+      <br><br>
+
+      <label for="price">price</label>
+      <input type="number" id="price" name="price" placeholder="price" />
+
+      <br><br>
+
+      <input type="reset" value="clear" />
+      <input type="submit" value="submit" />
+
+      <br><br><hr><hr>
+
+      <button type="button" id="muhil">EDIT</button>
+
+      <br><br><hr>
+      <button type="button" id="editAllBtn">Edit All</button>
+      <button type="button" id="saveAllBtn" style="display:none;">Save</button>
+
+      <br><br><hr>
+
+      <button type="button" id="qwe" onclick="clearAll()">Clear table</button>
+      <br><br><hr>
+      <button type="button" id="printBtn" onclick="printReport()">Print / Save PDF</button>
+    </form>
+
+    <div id="groups"></div>
+
+    <div id="eraseBox" style="width:95%;max-width:1100px;margin:10px auto;text-align:center;">
+      <button type="button" id="eraseBtn" class="qwe">Erase Row</button>
+
+      <div id="eraseForm" style="display:none;margin-top:10px;">
+        <input type="number" id="eraseTableNo" min="1" max="8" placeholder="Table no (1-8)">
+        <input type="number" id="eraseRowNo" min="1" placeholder="Row no (N)">
+        <button type="button" id="eraseSubmit" class="muhil">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // CLOUD STORAGE UPLOAD
+  const fileInput = document.getElementById("fileInput");
+  const uploadBtn = document.getElementById("uploadBtn");
+  const uploadStatus = document.getElementById("uploadStatus");
+
+  uploadBtn.addEventListener("click", () => {
+    const user = auth.currentUser;
+    if (!user) {
+      alert("Please login again.");
+      return;
+    }
+
+    const file = fileInput.files[0];
+    if (!file) {
+      alert("Choose a file first.");
+      return;
+    }
+
+    const storageRef = storage.ref(`uploads/${user.uid}/${file.name}`);
+    const task = storageRef.put(file);
+
+    task.on(
+      "state_changed",
+      snapshot => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        uploadStatus.textContent = `Upload: ${progress.toFixed(0)}%`;
+      },
+      error => {
+        uploadStatus.textContent = "Error: " + error.message;
+      },
+      () => {
+        task.snapshot.ref.getDownloadURL().then(url => {
+          uploadStatus.textContent = "Done. URL: " + url;
+          console.log("File available at", url);
+        });
+      }
+    );
+  });
+
+  /* ---------------- PRICE CHART ---------------- */
+  const PRICELIST = [
+    { brand: "Old king xxxx rum", ml: 180, price: 140 },
+    { brand: "Old king xxxx rum", ml: 375, price: 280 },
+    { brand: "Old king xxxx rum", ml: 750, price: 560 },
+    { brand: "Mens club dlx bdy", ml: 180, price:140 },
+    { brand: "Mens club dlx bdy", ml: 375, price:280 },
+    { brand: "Mens club dlx bdy", ml: 750, price:560 },
+    { brand: "Binneys dlx bdy", ml: 180, price:140 },
+    { brand: "Binneys dlx bdy", ml: 375, price:280 },
+    { brand: "Binneys dlx bdy", ml: 750, price:560 },
+    { brand: "Diamond bdy", ml: 180, price:140 },
+    { brand: "Diamond bdy", ml: 375, price:280 },
+    { brand: "Diamond bdy", ml: 750, price:560 },
+    { brand: "Diamond why", ml: 180, price:140 },
+    { brand: "Diamond why", ml: 375, price:280 },
+    { brand: "Diamond why", ml: 750, price:560 },
+    { brand: "Diamond xxx rum", ml: 180, price:140 },
+    { brand: "Diamond xxx rum", ml: 375, price:280 },
+    { brand: "Diamond xxx rum", ml: 750, price:560 },
+    { brand: "Mclene bdy", ml: 180, price:140 },
+    { brand: "Mclene bdy", ml: 375, price:280 },
+    { brand: "Mclene bdy", ml: 750, price:560 },
+    { brand: "Old secret xxx rum", ml: 180, price:140 },
+    { brand: "Old secret xxx rum", ml: 375, price:280 },
+    { brand: "Old secret xxx rum", ml: 750, price:560 },
+    { brand: "OLd chef dlx bdy", ml: 180, price:140 },
+    { brand: "OLd chef dlx bdy", ml: 375, price:280 },
+    { brand: "OLd chef dlx bdy", ml: 750, price:560 },
+    { brand: "Imp express spl bdy", ml: 180, price:140 },
+    { brand: "Imp express spl bdy", ml: 375, price:280 },
+    { brand: "Imp express spl bdy", ml: 750, price:560 },
+    { brand: "Imp express spl rum", ml: 180, price:140 },
+    { brand: "Imp express spl rum", ml: 375, price:280 },
+    { brand: "Imp express spl rum", ml: 750, price:560 },
+    { brand: "Golden eagle dr ord bdy", ml: 180, price:140 },
+    { brand: "Golden eagle dr ord bdy", ml: 375, price:280 },
+    { brand: "Golden eagle dr ord bdy", ml: 750, price:560 },
+    { brand: "Old monk dlx rum", ml: 180, price:140 },
+    { brand: "Old monk dlx rum", ml: 375, price:280 },
+    { brand: "Old monk dlx rum", ml: 750, price:560 },
+    { brand: "Vorion no.1 ind bdy", ml: 180, price:140 },
+    { brand: "Vorion no.1 ind bdy", ml: 375, price:280 },
+    { brand: "Vorion no.1 ind bdy", ml: 750, price:560 },
+    { brand: "Vorion no.1 ind xxx rum", ml: 180, price:140 },
+    { brand: "Vorion no.1 ind xxx rum", ml: 375, price:280 },
+    { brand: "Vorion no.1 ind xxx rum", ml: 750, price:560 },
+    { brand: "Monitor ord 3D gold rum", ml: 180, price:140 },
+    { brand: "Monitor ord 3D gold rum", ml: 375, price:280 },
+    { brand: "Monitor ord 3D gold rum", ml: 750, price:560 },
+    { brand: "Monitor dlx bdy", ml: 180, price:140 },
+    { brand: "Monitor dlx bdy", ml: 375, price:280 },
+    { brand: "Monitor dlx bdy", ml: 750, price:560 },
+    { brand: "Monitor dlx why", ml: 180, price:140 },
+    { brand: "Monitor dlx why", ml: 375, price:280 },
+    { brand: "Monitor dlx why", ml: 750, price:560 },
+    { brand: "Top star spl bdy", ml: 180, price:140 },
+    { brand: "Top star spl bdy", ml: 375, price:280 },
+    { brand: "Top star spl bdy", ml: 750, price:560 },
+    { brand: "Old chef str xxx rum", ml: 180, price:140 },
+    { brand: "Old chef str xxx rum", ml: 375, price:280 },
+    { brand: "Old chef str xxx rum", ml: 750, price:560 },
+    { brand: "top star spl why", ml: 180, price:140 },
+    { brand: "top star spl why", ml: 375, price:280 },
+    { brand: "top star spl why", ml: 750, price:560 },
+    { brand: "Top star str xxx rum ", ml: 180, price:140 },
+    { brand: "Top star str xxx rum", ml: 375, price:280 },
+    { brand: "Top star str xxx rum", ml: 750, price:560 },
+    { brand: "Honey day bdy", ml: 180, price:140 },
+    { brand: "Honey day bdy", ml: 375, price:280 },
+    { brand: "Honey day bdy", ml: 750, price:560 },
+    { brand: "Old monster xxx rum", ml: 180, price:140 },
+    { brand: "Old monster xxx rum", ml: 375, price:280 },
+    { brand: "Old monster xxx rum", ml: 750, price:560 },
+    { brand: "Arabian pride dlx xxx rum", ml: 180, price:140 },
+    { brand: "Arabian pride dlx xxx rum", ml: 375, price:280 },
+    { brand: "Arabian pride dlx xxx rum", ml: 750, price:560 },
+    { brand: "Honey day sup fin why", ml: 180, price:140 },
+    { brand: "Honey day sup fin why", ml: 375, price:280 },
+    { brand: "Honey day sup fin why", ml: 750, price:560 },
+    { brand: "golden choice dlx bdy", ml: 180, price:140 },
+    { brand: "golden choice dlx bdy", ml: 375, price:280 },
+    { brand: "golden choice dlx bdy", ml: 750, price:560 },
+    { brand: "Seamens pride cl bdy", ml: 180, price:140 },
+    { brand: "Seamens pride cl bdy", ml: 375, price:280 },
+    { brand: "Seamens pride cl bdy", ml: 750, price:560 },
+    { brand: "Oneman army xxx rum", ml: 180, price:140 },
+    { brand: "Oneman army xxx rum", ml: 375, price:280 },
+    { brand: "Oneman army xxx rum", ml: 750, price:560 },
+    { brand: "Black pearl bdy", ml: 180, price:140 },
+    { brand: "Black pearl bdy", ml: 375, price:280 },
+    { brand: "Black pearl bdy", ml: 750, price:560 },
+    { brand: "Black pearl xxx rum", ml: 180, price:140 },
+    { brand: "Black pearl xxx rum", ml: 375, price:280 },
+    { brand: "Black pearl xxx rum", ml: 750, price:560 },
+    { brand: "Red sea win", ml: 180, price:120 },
+    { brand: "Red sea win", ml: 375, price:240 },
+    { brand: "Red sea win", ml: 750, price:480 },
+    { brand: "Misty grapes win", ml: 180, price:130 },
+    { brand: "Misty grapes win", ml: 375, price:260 },
+    { brand: "Misty grapes win", ml: 750, price:520 },
+    /* ... keep rest of your PRICELIST as you had it ... */
+  ];
+
+  function printReport() {
+    renderGroupedTables();
+    window.print();
+  }
+
+  const BRANDS = [...new Set(PRICELIST.map(x => x.brand))].sort();
+
+  const STORAGEKEY = "calcrecords";
+  let records = [];
+
+  function loadData() {
+    const saved = localStorage.getItem(STORAGEKEY);
+    if (saved) records = JSON.parse(saved);
+  }
+  function saveData() {
+    localStorage.setItem(STORAGEKEY, JSON.stringify(records));
+  }
+
+  const form = document.getElementById("information");
+  const brandInput = document.getElementById("brand");
+  const mlSelect = document.getElementById("ml");
+  const priceInput = document.getElementById("price");
+  const datalist = document.getElementById("suggestions");
+
+  if (brandInput) brandInput.setAttribute("list", "suggestions");
+
+  function renderBrandOptions(filterText) {
+    if (!datalist) return;
+    datalist.innerHTML = "";
+    const q = (filterText || "").toLowerCase();
+
+    BRANDS
+      .filter(b => b.toLowerCase().includes(q))
+      .slice(0, 30)
+      .forEach(b => {
+        const opt = document.createElement("option");
+        opt.value = b;
+        datalist.appendChild(opt);
+      });
+  }
+
+  function autoApplyPrice() {
+    const brand = brandInput.value.trim();
+    const ml = parseFloat(mlSelect.value || 0);
+    if (!brand || !ml) return;
+
+    const match = PRICELIST.find(x => x.brand === brand && x.ml === ml);
+    if (match) priceInput.value = match.price;
+    else priceInput.value = "";
+  }
+
+  if (brandInput) {
+    brandInput.addEventListener("input", () => {
+      renderBrandOptions(brandInput.value);
+      autoApplyPrice();
+    });
+    brandInput.addEventListener("focus", () => renderBrandOptions(brandInput.value));
+  }
+  if (mlSelect) {
+    mlSelect.addEventListener("change", autoApplyPrice);
+  }
+
+  function money(n) { return (Number(n) || 0).toFixed(2); }
+  function sumField(arr, idx) { return arr.reduce((a, r) => a + (Number(r[idx]) || 0), 0); }
+
+  const GROUPS = [
+    { key: "180_140",   title: "Table 1: 180 ml (Price <= 140)",  filter: r => r[1] === 180 && r[5] <= 140 },
+    { key: "180_170",   title: "Table 2: 180 ml (Price = 170)",  filter: r => r[1] === 180 && r[5] === 170 },
+    { key: "180_gt200", title: "Table 3: 180 ml (Price >= 200)",  filter: r => r[1] === 180 && r[5] >= 200 },
+
+    { key: "375",  title: "Table 4: 375 ml",  filter: r => r[1] === 375 },
+    { key: "750",  title: "Table 5: 750 ml",  filter: r => r[1] === 750 },
+    { key: "1000", title: "Table 6: 1000 ml", filter: r => r[1] === 1000 },
+    { key: "650",  title: "Table 7: 650 ml",  filter: r => r[1] === 650 },
+    { key: "500",  title: "Table 8: 500 ml",  filter: r => r[1] === 500 },
+  ];
+
+  function renderGroupedTables() {
+    const host = document.getElementById("groups");
+    if (!host) return;
+    host.innerHTML = "";
+
+    let t9OB = 0, t9CB = 0, t9Sales = 0, t9SV = 0, t9CBV = 0;
+    let t10OB = 0, t10CB = 0, t10Sales = 0, t10SV = 0, t10CBV = 0;
+
+    GROUPS.forEach((g, idx) => {
+      const rows = records
+        .filter(g.filter)
+        .slice()
+        .sort((a, b) => Number(a[5]) - Number(b[5]));
+
+      const totalOB = sumField(rows, 2);
+      const totalCB = sumField(rows, 3);
+      const totalSales = sumField(rows, 4);
+      const totalSV = sumField(rows, 6);
+      const totalCBV = sumField(rows, 7);
+
+      if (idx >= 0 && idx <= 5) {
+        t9OB += totalOB; t9CB += totalCB; t9Sales += totalSales; t9SV += totalSV; t9CBV += totalCBV;
+      }
+      if (idx >= 6 && idx <= 7) {
+        t10OB += totalOB; t10CB += totalCB; t10Sales += totalSales; t10SV += totalSV; t10CBV += totalCBV;
+      }
+
+      const title = document.createElement("h2");
+      title.className = "groupTitle";
+      title.textContent = g.title;
+      host.appendChild(title);
+
+      const t = document.createElement("table");
+      t.innerHTML = `
+        <thead>
+          <tr>
+            <th>S.No</th><th>Brand</th><th>ML</th><th>OB</th><th>CB</th>
+            <th>Sales</th><th>Price</th><th>Sales Value</th><th>CB Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${
+            rows.length === 0
+              ? `<tr><td colspan="9" style="text-align:center">No records</td></tr>`
+              : rows.map((r, i) => `
+                <tr>
+                  <td>${i + 1}</td>
+                  <td>${r[0]}</td>
+                  <td>${r[1]}</td>
+                  <td>${r[2]}</td>
+                  <td>${r[3]}</td>
+                  <td>${r[4]}</td>
+                  <td>${r[5]}</td>
+                  <td>${money(r[6])}</td>
+                  <td>${money(r[7])}</td>
+                </tr>
+              `).join("")
+          }
+        </tbody>
+      `;
+      host.appendChild(t);
+
+      const totals = document.createElement("table");
+      totals.className = "totalsTable";
+      totals.innerHTML = `
+        <tr>
+          <td>Total OB BOT: ${money(totalOB)}</td>
+          <td>Total CB BOT: ${money(totalCB)}</td>
+          <td>Total Sales BOT: ${money(totalSales)}</td>
+          <td>Total Sales Value: ${money(totalSV)}</td>
+          <td>Total CB Value: ${money(totalCBV)}</td>
+        </tr>
+      `;
+      host.appendChild(totals);
+    });
+
+    const t9Title = document.createElement("h2");
+    t9Title.className = "groupTitle";
+    t9Title.textContent = "(IMSF)";
+    host.appendChild(t9Title);
+
+    const t9Totals = document.createElement("table");
+    t9Totals.className = "totalsTable";
+    t9Totals.innerHTML = `
+      <tr>
+        <td>Total OB BOT: ${money(t9OB)}</td>
+        <td>Total CB BOT: ${money(t9CB)}</td>
+        <td>Total Sales BOT: ${money(t9Sales)}</td>
+        <td>Total Sales Value: ${money(t9SV)}</td>
+        <td>Total CB Value: ${money(t9CBV)}</td>
+      </tr>
+    `;
+    host.appendChild(t9Totals);
+
+    const t10Title = document.createElement("h2");
+    t10Title.className = "groupTitle";
+    t10Title.textContent = "(BEER)";
+    host.appendChild(t10Title);
+
+    const t10Totals = document.createElement("table");
+    t10Totals.className = "totalsTable";
+    t10Totals.innerHTML = `
+      <tr>
+        <td>Total OB BOT: ${money(t10OB)}</td>
+        <td>Total CB BOT: ${money(t10CB)}</td>
+        <td>Total Sales BOT: ${money(t10Sales)}</td>
+        <td>Total Sales Value: ${money(t10SV)}</td>
+        <td>Total CB Value: ${money(t10CBV)}</td>
+      </tr>
+    `;
+    host.appendChild(t10Totals);
+
+    const totalTitle = document.createElement("h2");
+    totalTitle.className = "groupTitle";
+    totalTitle.textContent = "Total(IMSF&BEER)";
+    host.appendChild(totalTitle);
+
+    const totalTable = document.createElement("table");
+    totalTable.className = "totalsTable";
+
+    const totalOB = t9OB + t10OB;
+    const totalCB = t9CB + t10CB;
+    const totalSales = t9Sales + t10Sales;
+    const totalSV = t9SV + t10SV;
+    const totalCBV = t9CBV + t10CBV;
+
+    totalTable.innerHTML = `
+      <tr>
+        <td>Total OB BOT: ${money(totalOB)}</td>
+        <td>Total CB BOT: ${money(totalCB)}</td>
+        <td>Total Sales BOT: ${money(totalSales)}</td>
+        <td>Total Sales Value: ${money(totalSV)}</td>
+        <td>Total CB Value: ${money(totalCBV)}</td>
+      </tr>
+    `;
+    host.appendChild(totalTable);
+  }
+
+  const editAllBtn = document.getElementById("editAllBtn");
+  const saveAllBtn = document.getElementById("saveAllBtn");
+  let currentEditGroupIndex = null;
+
+  if (editAllBtn) {
+    editAllBtn.addEventListener("click", function () {
+      const tableNoStr = prompt("Enter Table Number (1-8) to Edit All OB & CB:");
+      if (tableNoStr === null) return;
+
+      const tableNo = parseInt(tableNoStr, 10);
+      if (!Number.isInteger(tableNo) || tableNo < 1 || tableNo > 8) {
+        alert("Please enter a number from 1 to 8.");
+        return;
+      }
+
+      const host = document.getElementById("groups");
+      const allTables = host.querySelectorAll("table");
+      const mainTableIndex = (tableNo - 1) * 2;
+      const table = allTables[mainTableIndex];
+
+      if (!table) {
+        alert("Table not found.");
+        return;
+      }
+
+      currentEditGroupIndex = tableNo - 1;
+
+      for (let i = 1; i < table.rows.length; i++) {
+        const row = table.rows[i];
+        const obCell = row.cells[3];
+        const cbCell = row.cells[4];
+        if (!obCell || !cbCell) continue;
+
+        obCell.contentEditable = "true";
+        cbCell.contentEditable = "true";
+        obCell.classList.add("editing");
+        cbCell.classList.add("editing");
+      }
+
+      editAllBtn.style.display = "none";
+      saveAllBtn.style.display = "inline-block";
+    });
+  }
+
+  if (saveAllBtn) {
+    saveAllBtn.addEventListener("click", function () {
+      if (currentEditGroupIndex === null) return;
+
+      const host = document.getElementById("groups");
+      const allTables = host.querySelectorAll("table");
+      const mainTableIndex = currentEditGroupIndex * 2;
+      const table = allTables[mainTableIndex];
+      if (!table) return;
+
+      const g = GROUPS[currentEditGroupIndex];
+
+      const groupRows = records
+        .map((rec, idx) => ({ rec, idx }))
+        .filter(x => g.filter(x.rec))
+        .sort((a, b) => Number(a.rec[5]) - Number(b.rec[5]));
+
+      for (let i = 1; i < table.rows.length && i <= groupRows.length; i++) {
+        const rowEl = table.rows[i];
+        const obCell = rowEl.cells[3];
+        const cbCell = rowEl.cells[4];
+        if (!obCell || !cbCell) continue;
+
+        obCell.contentEditable = "false";
+        cbCell.contentEditable = "false";
+        obCell.classList.remove("editing");
+        cbCell.classList.remove("editing");
+
+        const newOB = parseFloat(obCell.textContent || 0);
+        const newCB = parseFloat(cbCell.textContent || 0);
+
+        const recIndex = groupRows[i - 1].idx;
+        const rec = records[recIndex];
+
+        rec[2] = newOB;
+        rec[3] = newCB;
+        rec[4] = newOB - newCB;
+        rec[6] = rec[5] * rec[4];
+        rec[7] = rec[5] * rec[3];
+      }
+
+      saveData();
+      renderGroupedTables();
+
+      currentEditGroupIndex = null;
+      saveAllBtn.style.display = "none";
+      editAllBtn.style.display = "inline-block";
+    });
+  }
+
+  if (form) {
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const brand = brandInput.value.trim();
+      const ml = parseFloat(mlSelect.value || 0);
+      const ob = parseFloat(document.getElementById("ob").value || 0);
+      const cb = parseFloat(document.getElementById("cb").value || 0);
+      const price = parseFloat(priceInput.value || 0);
+
+      if (!brand || !ml || !price) {
+        alert("Please select Brand + ML. Price will auto-fill. If price is empty, add that brand+ml in PRICELIST.");
+        return;
+      }
+
+      const sales = ob - cb;
+      const sv = price * sales;
+      const cbv = price * cb;
+
+      const newRecord = [brand, ml, ob, cb, sales, price, sv, cbv];
+      const groupIndex = GROUPS.findIndex(g => g.filter(newRecord));
+      if (groupIndex === -1) {
+        alert("This record doesn't match any table rules.");
+        return;
+      }
+
+      const editIndexStr = localStorage.getItem("editIndex");
+      const isEditing = editIndexStr !== null;
+      const editIndex = isEditing ? parseInt(editIndexStr, 10) : -1;
+
+      if (isEditing) {
+        records[editIndex] = newRecord;
+        localStorage.removeItem("editIndex");
+        alert("Row updated successfully.");
+      } else {
+        const duplicateInSameTable = records.some(r =>
+          GROUPS[groupIndex].filter(r) && r[0].toLowerCase() === brand.toLowerCase()
+        );
+
+        if (duplicateInSameTable) {
+          alert(`"${brand}" already exists in Table ${groupIndex + 1}. Not added.`);
+          return;
+        }
+
+        records.push(newRecord);
+      }
+
+      saveData();
+      renderGroupedTables();
+
+      form.reset();
+      brandInput.setAttribute("list", "suggestions");
+      datalist.innerHTML = "";
+    });
+  }
+
+  const eraseBtn = document.getElementById("eraseBtn");
+  const eraseForm = document.getElementById("eraseForm");
+  const eraseSubmit = document.getElementById("eraseSubmit");
+
+  if (eraseBtn) {
+    eraseBtn.addEventListener("click", () => {
+      eraseForm.style.display = eraseForm.style.display === "none" ? "block" : "none";
+    });
+  }
+
+  if (eraseSubmit) {
+    eraseSubmit.addEventListener("click", () => {
+      const tno = parseInt(document.getElementById("eraseTableNo").value, 10);
+      const rno = parseInt(document.getElementById("eraseRowNo").value, 10);
+
+      if (!Number.isInteger(tno) || tno < 1 || tno > 8) {
+        alert("Enter table number 1 to 8");
+        return;
+      }
+      if (!Number.isInteger(rno) || rno < 1) {
+        alert("Enter row number N (1,2,3...)");
+        return;
+      }
+
+      const g = GROUPS[tno - 1];
+
+      const tableRows = records
+        .map((rec, idx) => ({ rec, idx }))
+        .filter(x => g.filter(x.rec))
+        .sort((a, b) => Number(a.rec[5]) - Number(b.rec[5]));
+
+      if (tableRows.length === 0) {
+        alert("No records in this table");
+        return;
+      }
+      if (rno > tableRows.length) {
+        alert(`This table has only ${tableRows.length} rows`);
+        return;
+      }
+
+      const removeIndex = tableRows[rno - 1].idx;
+      records.splice(removeIndex, 1);
+      saveData();
+      renderGroupedTables();
+
+      document.getElementById("eraseTableNo").value = "";
+      document.getElementById("eraseRowNo").value = "";
+    });
+  }
+
+  const singleEditBtn = document.getElementById("muhil");
+  if (singleEditBtn) {
+    singleEditBtn.addEventListener("click", function () {
+      const tableNoStr = prompt("Enter Table Number to edit:");
+      if (tableNoStr === null) return;
+
+      const rowNoStr = prompt("Enter Row Number to edit:");
+      if (rowNoStr === null) return;
+
+      const tableNo = parseInt(tableNoStr, 10);
+      const rowNo = parseInt(rowNoStr, 10);
+
+      if (!Number.isInteger(tableNo) || !Number.isInteger(rowNo) || tableNo < 1 || tableNo > 8 || rowNo < 1) {
+        alert("Invalid table or row number.");
+        return;
+      }
+
+      const groupIndex = tableNo - 1;
+      const g = GROUPS[groupIndex];
+
+      const groupRecords = records
+        .map((r, idx) => ({ r, idx }))
+        .filter(obj => g.filter(obj.r))
+        .sort((a, b) => Number(a.r[5]) - Number(b.r[5]));
+
+      if (groupRecords.length === 0) {
+        alert("No records in this table.");
+        return;
+      }
+      if (rowNo > groupRecords.length) {
+        alert(`This table has only ${groupRecords.length} rows.`);
+        return;
+      }
+
+      const target = groupRecords[rowNo - 1];
+      const globalIndex = target.idx;
+      const row = target.r;
+
+      brandInput.value = row[0];
+      mlSelect.value = row[1];
+      document.getElementById("ob").value = row[2];
+      document.getElementById("cb").value = row[3];
+      priceInput.value = row[5];
+
+      localStorage.setItem("editIndex", globalIndex);
+
+      alert("Row loaded. Edit values and press Submit to save.");
+    });
+  }
+
+  function clearAll() {
+    const ok = confirm("Do you want to clear all records?");
+    if (!ok) return;
+
+    const text = prompt('Type "yes" to clear all records:');
+    if (text === null) return;
+
+    if (text.toLowerCase() !== "yes") {
+      alert("Clear cancelled.");
+      return;
+    }
+
+    records = [];
+    localStorage.removeItem(STORAGEKEY);
+    renderGroupedTables();
+  }
+  window.clearAll = clearAll;
+
+  loadData();
+  renderBrandOptions("");
+  renderGroupedTables();
+  </script>
+</body>
+</html>
