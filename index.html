@@ -938,12 +938,13 @@
     }
 
    /* --------- EDIT ALL (TABLE 1–8, OB/CB/Sales editable) --------- */
+/* --------- EDIT ALL (OB & Sales editable, CB auto) --------- */
 const editAllBtn = document.getElementById("editAllBtn");
 const saveAllBtn = document.getElementById("saveAllBtn");
 let currentEditGroupIndex = null;
 
 editAllBtn.addEventListener("click", function () {
-  const tableNoStr = prompt("Enter Table Number (1-8) to Edit All OB, CB & Sales:");
+  const tableNoStr = prompt("Enter Table Number (1-8) to Edit All OB & Sales:");
   if (tableNoStr === null) return;
 
   const tableNo = parseInt(tableNoStr, 10);
@@ -966,20 +967,17 @@ editAllBtn.addEventListener("click", function () {
 
   currentEditGroupIndex = tableNo - 1;
 
-  // make OB (3), CB (4), Sales (5) editable
+  // make OB (3) and Sales (5) editable
   for (let i = 1; i < table.rows.length; i++) {
     const row = table.rows[i];
     const obCell    = row.cells[3];
-    const cbCell    = row.cells[4];
     const salesCell = row.cells[5];
-    if (!obCell || !cbCell || !salesCell) continue;
+    if (!obCell || !salesCell) continue;
 
     obCell.contentEditable    = "true";
-    cbCell.contentEditable    = "true";
     salesCell.contentEditable = "true";
 
     obCell.classList.add("editing");
-    cbCell.classList.add("editing");
     salesCell.classList.add("editing");
   }
 
@@ -1012,25 +1010,26 @@ saveAllBtn.addEventListener("click", function () {
     if (!obCell || !cbCell || !salesCell) continue;
 
     obCell.contentEditable    = "false";
-    cbCell.contentEditable    = "false";
     salesCell.contentEditable = "false";
 
     obCell.classList.remove("editing");
-    cbCell.classList.remove("editing");
     salesCell.classList.remove("editing");
 
     const newOB    = parseFloat(obCell.textContent    || 0);
-    const newCB    = parseFloat(cbCell.textContent    || 0);
     const newSales = parseFloat(salesCell.textContent || 0);
+    const newCB    = newOB - newSales;   // CB auto from OB & Sales
 
     const recIndex = groupRows[i - 1].idx;
     const rec = records[recIndex];
 
-    rec[2] = newOB;           // OB
-    rec[3] = newCB;           // CB
-    rec[4] = newSales;        // Sales (from user)
+    rec[2] = newOB;        // OB
+    rec[4] = newSales;     // Sales
+    rec[3] = newCB;        // CB (auto)
     rec[6] = rec[5] * rec[4]; // Sales Value
     rec[7] = rec[5] * rec[3]; // CB Value
+
+    // update CB cell text for user
+    cbCell.textContent = newCB;
   }
 
   saveData();
