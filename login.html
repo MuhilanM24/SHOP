@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login – SHOP NO:2605</title>
+  <style>
+    body {
+      background: #b2ffda;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    h1 { margin-bottom: 20px; }
+    #status { margin-top: 15px; font-weight: bold; }
+  </style>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <h1>Login to SHOP NO:2605</h1>
+
+  <!-- Google button -->
+  <div id="g_id_onload"
+       data-client_id="YOUR_WEB_CLIENT_ID.apps.googleusercontent.com"
+       data-callback="handleLogin"
+       data-auto_prompt="false"></div>
+  <div class="g_id_signin" data-type="standard"></div>
+
+  <div id="status">Not signed in</div>
+
+  <script>
+    // Called by Google Identity Services
+    function handleLogin(response) {
+      const credential = response.credential;
+      if (!credential) {
+        document.getElementById("status").textContent = "Login failed";
+        return;
+      }
+      // Pass credential to shop.html via query (encoded)
+      const c = encodeURIComponent(credential);
+      window.location.href = "shop.html?cred=" + c;
+    }
+  </script>
+</body>
+</html>
