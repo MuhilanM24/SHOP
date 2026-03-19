@@ -2,15 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Ⓜ️GROUPS CLOUD</title>
+  <title>Ⓜ️GROUPS</title>
   <style>
-    body { background: aquamarine; font-family: Arial, sans-serif; padding-bottom: 50px; }
+    body { background: aquamarine; font-family: Arial, sans-serif; }
     h1 { text-align: center; margin-top: 10px; }
-
-    /* Auth Bar */
-    .auth-bar { background: #333; color: white; padding: 10px; text-align: center; margin-bottom: 10px; border-radius: 5px; }
-    .auth-bar button { margin-left: 10px; padding: 5px 10px; cursor: pointer; }
-
     form {
       background: rgb(191, 183, 187);
       text-align: center;
@@ -19,49 +14,110 @@
       width: fit-content;
       border-radius: 10px;
     }
-    table { background: antiquewhite; margin: 12px auto; border-collapse: collapse; width: 95%; max-width: 1100px; }
+    table {
+      background: antiquewhite;
+      margin: 12px auto;
+      border-collapse: collapse;
+      width: 95%;
+      max-width: 1100px;
+    }
     th, td { border: 1px solid #333; padding: 6px 10px; }
     th { background: #f1e2c6; }
     .groupTitle { text-align: center; margin: 18px 0 6px; }
-    .totalsTable { width: 95%; max-width: 1100px; margin: 0 auto 18px; background: yellow; font-weight: bold; }
-
-    .btn-blue { background: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; margin: 5px; }
-    .btn-orange { background: #fd7e14; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; margin: 5px; }
-    .btn-purple { background: #6f42c1; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; margin: 5px; }
-
+    .totalsTable {
+      width: 95%;
+      max-width: 1100px;
+      margin: 0 auto 18px;
+      background: yellow;
+      font-weight: bold;
+    }
     #qwe { background: red; color: #fff; padding: 8px 14px; border: 0; cursor: pointer; }
     #muhil { background: green; color: #fff; padding: 8px 14px; border: 0; cursor: pointer; }
-
     input, select { padding: 6px; }
+    .editing { background: #ffeeba; }
 
-    /* Modal for Cloud List */
+    /* Auth bar */
+    .auth-bar {
+      background: #333;
+      color: white;
+      padding: 8px 10px;
+      margin: 5px auto 0;
+      max-width: 1100px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .auth-bar button {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    /* Cloud list modal */
     #listModal {
-      display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%;
-      background-color: rgba(0,0,0,0.7);
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 999;
     }
     .modal-content {
-      background-color: white; margin: 10% auto; padding: 20px; border-radius: 10px; width: 80%; max-width: 600px;
+      background: white;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 10px;
+      width: 80%;
+      max-width: 600px;
     }
 
     @media print {
-      form, .auth-bar, #listModal, #eraseBox, button { display: none !important; }
-      body { background: white !important; }
+      form,
+      #printBtn,
+      #muhil,
+      #qwe,
+      .muhil,
+      .qwe,
+      #eraseBox,
+      #eraseForm,
+      #eraseBtn,
+      #eraseSubmit,
+      .auth-bar,
+      #listModal,
+      #cloudButtons {
+        display: none !important;
+      }
+      body {
+        background: white !important;
+      }
+      table {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      .totalsTable {
+        page-break-inside: avoid;
+      }
+      h2 {
+        page-break-after: avoid;
+      }
     }
   </style>
 </head>
 
 <body>
-
-  <!-- GOOGLE LOGIN (Firebase Auth) -->
+  <!-- Google login bar -->
   <div class="auth-bar">
     <span id="userStatus">Not Logged In</span>
-    <button id="loginBtn">Google Login</button>
-    <button id="logoutBtn" style="display:none;">Logout</button>
+    <div>
+      <button id="loginBtn" style="background:#0d6efd;color:white;">Google Login</button>
+      <button id="logoutBtn" style="background:#dc3545;color:white;display:none;">Logout</button>
+    </div>
   </div>
 
   <h1>SHOP NO:2605</h1>
 
-  <!-- MAIN FORM -->
   <form id="information">
     <label for="brand">Brand name</label>
     <input type="text" id="brand" placeholder="Type brand name..." autocomplete="off" />
@@ -82,38 +138,68 @@
     </select>
 
     <br><br>
-    <label for="ob">Opening</label> <input type="number" id="ob" />
-    <label for="cb">Closing</label> <input type="number" id="cb" />
-    <br><br>
-    <label for="price">Price</label> <input type="number" id="price" />
+
+    <label for="ob">Enter opening balance</label>
+    <input type="number" id="ob" name="ob" placeholder="Enter the number" />
 
     <br><br>
-    <input type="submit" value="Submit Row" class="btn-blue" />
-    <input type="reset" value="Clear Form" />
 
-    <hr>
-    <h3>Cloud & Tools</h3>
-    <!-- NEXT DAY: OB = old CB, CB = 0 -->
-    <button type="button" class="btn-orange" id="nextDayBtn">☀️ NEXT DAY (CB → OB)</button>
-    <!-- STORE TO CLOUD: save all records for this user -->
-    <button type="button" class="btn-blue" id="storeCloudBtn">☁️ STORE TO CLOUD</button>
-    <!-- LIST BUTTON: show all stored reports and load one -->
-    <button type="button" class="btn-purple" id="listBtn">📂 LIST BUTTON</button>
+    <label for="cb">Enter closing balance</label>
+    <input type="number" id="cb" name="cb" placeholder="Enter the number" />
 
-    <hr>
-    <button type="button" id="muhil">EDIT ROW</button>
+    <br><br>
+
+    <label for="price">price</label>
+    <input type="number" id="price" name="price" placeholder="price" />
+
+    <br><br>
+
+    <input type="reset" value="clear" />
+    <input type="submit" value="submit" />
+
+    <br><br><hr><hr>
+
+    <button type="button" id="muhil">EDIT</button>
+
+    <br><br><hr>
     <button type="button" id="editAllBtn">Edit All</button>
-    <button type="button" id="saveAllBtn" style="display:none;">Save All</button>
-    <button type="button" id="qwe" onclick="clearAll()">Clear Table</button>
-    <button type="button" id="printBtn" onclick="window.print()">Print PDF</button>
+    <button type="button" id="saveAllBtn" style="display:none;">Save</button>
+
+    <br><br><hr>
+
+    <!-- New cloud-related buttons -->
+    <div id="cloudButtons">
+      <button type="button" id="nextDayBtn">☀️ NEXT DAY (CB → OB)</button>
+      <button type="button" id="storeCloudBtn">☁️ STORE TO CLOUD</button>
+      <button type="button" id="listBtn">📂 CLOUD LISTS</button>
+    </div>
+
+    <br><br><hr>
+
+    <button type="button" id="qwe" onclick="clearAll()">Clear table</button>
+    <br><br><hr>
+    <button type="button" id="printBtn" onclick="printReport()">Print / Save PDF</button>
+
   </form>
 
+  <!-- 8 tables -->
   <div id="groups"></div>
+
+  <!-- Erase row UI -->
+  <div id="eraseBox" style="width:95%;max-width:1100px;margin:10px auto;text-align:center;">
+    <button type="button" id="eraseBtn" class="qwe">Erase Row</button>
+
+    <div id="eraseForm" style="display:none;margin-top:10px;">
+      <input type="number" id="eraseTableNo" min="1" max="8" placeholder="Table no (1-8)">
+      <input type="number" id="eraseRowNo" min="1" placeholder="Row no (N)">
+      <button type="button" id="eraseSubmit" class="muhil">Submit</button>
+    </div>
+  </div>
 
   <!-- Cloud list modal -->
   <div id="listModal">
     <div class="modal-content">
-      <h2>Cloud Saved Records</h2>
+      <h2>Your Cloud Reports</h2>
       <div id="cloudDataList">Loading...</div>
       <br>
       <button onclick="document.getElementById('listModal').style.display='none'">Close</button>
@@ -126,7 +212,571 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <script>
-    // --- STEP 1: CONFIGURATION (FILL THESE) ---  [web:126]
+    /* ---------------- PRICE CHART (your full list) ---------------- */
+    const PRICELIST = [
+      { brand: "Old king xxxx rum", ml: 180, price: 140 },
+      { brand: "Old king xxxx rum", ml: 375, price: 280 },
+      { brand: "Old king xxxx rum", ml: 750, price: 560 },
+      { brand: "Mens club dlx bdy", ml: 180, price:140 },
+      { brand: "Mens club dlx bdy", ml: 375, price:280 },
+      { brand: "Mens club dlx bdy", ml: 750, price:560 },
+      { brand: "Binneys dlx bdy", ml: 180, price:140 },
+      { brand: "Binneys dlx bdy", ml: 375, price:280 },
+      { brand: "Binneys dlx bdy", ml: 750, price:560 },
+      { brand: "Diamond bdy", ml: 180, price:140 },
+      { brand: "Diamond bdy", ml: 375, price:280 },
+      { brand: "Diamond bdy", ml: 750, price:560 },
+      { brand: "Diamond why", ml: 180, price:140 },
+      { brand: "Diamond why", ml: 375, price:280 },
+      { brand: "Diamond why", ml: 750, price:560 },
+      { brand: "Diamond xxx rum", ml: 180, price:140 },
+      { brand: "Diamond xxx rum", ml: 375, price:280 },
+      { brand: "Diamond xxx rum", ml: 750, price:560 },
+      { brand: "Mclene bdy", ml: 180, price:140 },
+      { brand: "Mclene bdy", ml: 375, price:280 },
+      { brand: "Mclene bdy", ml: 750, price:560 },
+      { brand: "Old secret xxx rum", ml: 180, price:140 },
+      { brand: "Old secret xxx rum", ml: 375, price:280 },
+      { brand: "Old secret xxx rum", ml: 750, price:560 },
+      { brand: "OLd chef dlx bdy", ml: 180, price:140 },
+      { brand: "OLd chef dlx bdy", ml: 375, price:280 },
+      { brand: "OLd chef dlx bdy", ml: 750, price:560 },
+      { brand: "Imp express spl bdy", ml: 180, price:140 },
+      { brand: "Imp express spl bdy", ml: 375, price:280 },
+      { brand: "Imp express spl bdy", ml: 750, price:560 },
+      { brand: "Imp express spl rum", ml: 180, price:140 },
+      { brand: "Imp express spl rum", ml: 375, price:280 },
+      { brand: "Imp express spl rum", ml: 750, price:560 },
+      { brand: "Golden eagle dr ord bdy", ml: 180, price:140 },
+      { brand: "Golden eagle dr ord bdy", ml: 375, price:280 },
+      { brand: "Golden eagle dr ord bdy", ml: 750, price:560 },
+      { brand: "Old monk dlx rum", ml: 180, price:140 },
+      { brand: "Old monk dlx rum", ml: 375, price:280 },
+      { brand: "Old monk dlx rum", ml: 750, price:560 },
+      { brand: "Vorion no.1 ind bdy", ml: 180, price:140 },
+      { brand: "Vorion no.1 ind bdy", ml: 375, price:280 },
+      { brand: "Vorion no.1 ind bdy", ml: 750, price:560 },
+      { brand: "Vorion no.1 ind xxx rum", ml: 180, price:140 },
+      { brand: "Vorion no.1 ind xxx rum", ml: 375, price:280 },
+      { brand: "Vorion no.1 ind xxx rum", ml: 750, price:560 },
+      { brand: "Monitor ord 3D gold rum", ml: 180, price:140 },
+      { brand: "Monitor ord 3D gold rum", ml: 375, price:280 },
+      { brand: "Monitor ord 3D gold rum", ml: 750, price:560 },
+      { brand: "Monitor dlx bdy", ml: 180, price:140 },
+      { brand: "Monitor dlx bdy", ml: 375, price:280 },
+      { brand: "Monitor dlx bdy", ml: 750, price:560 },
+      { brand: "Monitor dlx why", ml: 180, price:140 },
+      { brand: "Monitor dlx why", ml: 375, price:280 },
+      { brand: "Monitor dlx why", ml: 750, price:560 },
+      { brand: "Top star spl bdy", ml: 180, price:140 },
+      { brand: "Top star spl bdy", ml: 375, price:280 },
+      { brand: "Top star spl bdy", ml: 750, price:560 },
+      { brand: "Old chef str xxx rum", ml: 180, price:140 },
+      { brand: "Old chef str xxx rum", ml: 375, price:280 },
+      { brand: "Old chef str xxx rum", ml: 750, price:560 },
+      { brand: "top star spl why", ml: 180, price:140 },
+      { brand: "top star spl why", ml: 375, price:280 },
+      { brand: "top star spl why", ml: 750, price:560 },
+      { brand: "Top star str xxx rum ", ml: 180, price:140 },
+      { brand: "Top star str xxx rum", ml: 375, price:280 },
+      { brand: "Top star str xxx rum", ml: 750, price:560 },
+      { brand: "Honey day bdy", ml: 180, price:140 },
+      { brand: "Honey day bdy", ml: 375, price:280 },
+      { brand: "Honey day bdy", ml: 750, price:560 },
+      { brand: "Old monster xxx rum", ml: 180, price:140 },
+      { brand: "Old monster xxx rum", ml: 375, price:280 },
+      { brand: "Old monster xxx rum", ml: 750, price:560 },
+      { brand: "Arabian pride dlx xxx rum", ml: 180, price:140 },
+      { brand: "Arabian pride dlx xxx rum", ml: 375, price:280 },
+      { brand: "Arabian pride dlx xxx rum", ml: 750, price:560 },
+      { brand: "Honey day sup fin why", ml: 180, price:140 },
+      { brand: "Honey day sup fin why", ml: 375, price:280 },
+      { brand: "Honey day sup fin why", ml: 750, price:560 },
+      { brand: "golden choice dlx bdy", ml: 180, price:140 },
+      { brand: "golden choice dlx bdy", ml: 375, price:280 },
+      { brand: "golden choice dlx bdy", ml: 750, price:560 },
+      { brand: "Seamens pride cl bdy", ml: 180, price:140 },
+      { brand: "Seamens pride cl bdy", ml: 375, price:280 },
+      { brand: "Seamens pride cl bdy", ml: 750, price:560 },
+      { brand: "Oneman army xxx rum", ml: 180, price:140 },
+      { brand: "Oneman army xxx rum", ml: 375, price:280 },
+      { brand: "Oneman army xxx rum", ml: 750, price:560 },
+      { brand: "Black pearl bdy", ml: 180, price:140 },
+      { brand: "Black pearl bdy", ml: 375, price:280 },
+      { brand: "Black pearl bdy", ml: 750, price:560 },
+      { brand: "Black pearl xxx rum", ml: 180, price:140 },
+      { brand: "Black pearl xxx rum", ml: 375, price:280 },
+      { brand: "Black pearl xxx rum", ml: 750, price:560 },
+      { brand: "Red sea win", ml: 180, price:120 },
+      { brand: "Red sea win", ml: 375, price:240 },
+      { brand: "Red sea win", ml: 750, price:480 },
+      { brand: "Misty grapes win", ml: 180, price:130 },
+      { brand: "Misty grapes win", ml: 375, price:260 },
+      { brand: "Misty grapes win", ml: 750, price:520 },
+      {brand: "No.1 mc dowell medium why", ml: 180, price:170},
+      {brand: "No.1 mc dowell medium why", ml: 375, price:340},
+      {brand: "No.1 mc dowell medium why", ml: 750, price:680},
+      {brand: "No.1 mc dowell fine bdy", ml: 180, price:170},
+      {brand: "No.1 mc dowell fine bdy", ml: 375, price:340},
+      {brand: "No.1 mc dowell fine bdy", ml: 750, price:680},
+      {brand: "Honey bee fine bdy", ml: 180, price:170},
+      {brand: "Honey bee fine bdy", ml: 375, price:340},
+      {brand: "Honey bee fine bdy", ml: 750, price:680},
+      {brand: "Officers choice classic why", ml: 180, price:170},
+      {brand: "Officers choice classic why", ml: 375, price:340},
+      {brand: "Officers choice classic why", ml: 750, price:680},
+      {brand: "Officers choice no.1 classic bdy", ml: 180, price:170},
+      {brand: "Officers choice no.1 classic bdy", ml: 375, price:340},
+      {brand: "Officers choice no.1 classic bdy", ml: 750, price:680},
+      {brand: "Old admiral select vsop bdy", ml: 180, price:170},
+      {brand: "Old admiral select vsop bdy", ml: 375, price:340},
+      {brand: "Old admiral select vsop bdy", ml: 750, price:680},
+      {brand: "Day night bdy", ml: 180, price:170},
+      {brand: "Day night bdy", ml: 375, price:340},
+      {brand: "Day night bdy", ml: 750, price:680},
+      {brand: "Mgm medium vodka", ml: 180, price:170},
+      {brand: "Mgm medium vodka", ml: 375, price:340},
+      {brand: "Mgm medium vodka", ml: 750, price:680},
+      {brand: "Mgm orange medium vodka", ml: 180, price:170},
+      {brand: "Mgm orange medium vodka", ml: 375, price:340},
+      {brand: "Mgm orange medium vooda", ml: 750, price:680},
+      {brand: "Mgm apple medium vodka", ml: 180, price:170},
+      {brand: "Mgm apple medium vodka", ml: 375, price:340},
+      {brand: "Mgm apple medium vodka", ml: 750, price:680},
+      {brand: "Mgm no.1 vsop bdy", ml: 180, price:170},
+      {brand: "Mgm no.1 vsop bdy", ml: 375, price:340},
+      {brand: "Mgm no.1 vsop bdy", ml: 750, price:680},
+      {brand: "Power apple vodka", ml: 180, price:170},
+      {brand: "Power apple vodka", ml: 375, price:340},
+      {brand: "Power apple vodka", ml: 750, price:680},
+      {brand: "Power orange vodka", ml: 180, price:170},
+      {brand: "Power orange vodka", ml: 375, price:340},
+      {brand: "Power orange vodka", ml: 750, price:680},
+      {brand: "All gold v.s.o.p bdy", ml: 180, price:170},
+      {brand: "All gold v.s.o.p bdy", ml: 375, price:340},
+      {brand: "All gold v.s.o.p bdy", ml: 750, price:680},
+      // ... keep all remaining entries you pasted ...
+      {brand: "mgm limon vodka", ml: 180, price:250},
+      {brand: "mgm limon vodka", ml: 375, price:500},
+      {brand: "mgm limon vodka", ml: 650, price:1000},
+    ];
+
+    function printReport() {
+      renderGroupedTables();
+      window.print();
+    }
+
+    const BRANDS = [...new Set(PRICELIST.map(x => x.brand))].sort();
+
+    const STORAGEKEY = "calcrecords";
+    let records = [];
+
+    function loadData() {
+      const saved = localStorage.getItem(STORAGEKEY);
+      if (saved) records = JSON.parse(saved);
+    }
+    function saveData() {
+      localStorage.setItem(STORAGEKEY, JSON.stringify(records));
+    }
+
+    const form = document.getElementById("information");
+    const brandInput = document.getElementById("brand");
+    const mlSelect = document.getElementById("ml");
+    const priceInput = document.getElementById("price");
+    const datalist = document.getElementById("suggestions");
+
+    brandInput.setAttribute("list", "suggestions");
+
+    function renderBrandOptions(filterText) {
+      datalist.innerHTML = "";
+      const q = (filterText || "").toLowerCase();
+      BRANDS
+        .filter(b => b.toLowerCase().includes(q))
+        .slice(0, 30)
+        .forEach(b => {
+          const opt = document.createElement("option");
+          opt.value = b;
+          datalist.appendChild(opt);
+        });
+    }
+
+    function autoApplyPrice() {
+      const brand = brandInput.value.trim();
+      const ml = parseFloat(mlSelect.value || 0);
+      if (!brand || !ml) return;
+      const match = PRICELIST.find(x => x.brand === brand && x.ml === ml);
+      priceInput.value = match ? match.price : "";
+    }
+
+    brandInput.addEventListener("input", () => {
+      renderBrandOptions(brandInput.value);
+      autoApplyPrice();
+    });
+    brandInput.addEventListener("focus", () => renderBrandOptions(brandInput.value));
+    mlSelect.addEventListener("change", autoApplyPrice);
+
+    function money(n) { return (Number(n) || 0).toFixed(2); }
+    function sumField(arr, idx) { return arr.reduce((a, r) => a + (Number(r[idx]) || 0), 0); }
+
+    const GROUPS = [
+      { key: "180_140",   title: "Table 1: 180 ml (Price <= 140)",  filter: r => r[1] === 180 && r[5] <= 140 },
+      { key: "180_170",   title: "Table 2: 180 ml (Price = 170)",  filter: r => r[1] === 180 && r[5] === 170 },
+      { key: "180_gt200", title: "Table 3: 180 ml (Price >= 200)",  filter: r => r[1] === 180 && r[5] >= 200 },
+      { key: "375",  title: "Table 4: 375 ml",  filter: r => r[1] === 375 },
+      { key: "750",  title: "Table 5: 750 ml",  filter: r => r[1] === 750 },
+      { key: "1000", title: "Table 6: 1000 ml", filter: r => r[1] === 1000 },
+      { key: "650",  title: "Table 7: 650 ml",  filter: r => r[1] === 650 },
+      { key: "500",  title: "Table 8: 500 ml",  filter: r => r[1] === 500 },
+    ];
+
+    function renderGroupedTables() {
+      const host = document.getElementById("groups");
+      host.innerHTML = "";
+
+      let t9OB = 0, t9CB = 0, t9Sales = 0, t9SV = 0, t9CBV = 0;
+      let t10OB = 0, t10CB = 0, t10Sales = 0, t10SV = 0, t10CBV = 0;
+
+      GROUPS.forEach((g, idx) => {
+        const rows = records
+          .filter(g.filter)
+          .slice()
+          .sort((a, b) => Number(a[5]) - Number(b[5]));
+
+        const totalOB = sumField(rows, 2);
+        const totalCB = sumField(rows, 3);
+        const totalSales = sumField(rows, 4);
+        const totalSV = sumField(rows, 6);
+        const totalCBV = sumField(rows, 7);
+
+        if (idx >= 0 && idx <= 5) {
+          t9OB += totalOB; t9CB += totalCB; t9Sales += totalSales; t9SV += totalSV; t9CBV += totalCBV;
+        }
+        if (idx >= 6 && idx <= 7) {
+          t10OB += totalOB; t10CB += totalCB; t10Sales += totalSales; t10SV += totalSV; t10CBV += totalCBV;
+        }
+
+        const title = document.createElement("h2");
+        title.className = "groupTitle";
+        title.textContent = g.title;
+        host.appendChild(title);
+
+        const t = document.createElement("table");
+        t.innerHTML = `
+          <thead>
+            <tr>
+              <th>S.No</th><th>Brand</th><th>ML</th><th>OB</th><th>CB</th>
+              <th>Sales</th><th>Price</th><th>Sales Value</th><th>CB Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${
+              rows.length === 0
+                ? `<tr><td colspan="9" style="text-align:center">No records</td></tr>`
+                : rows.map((r, i) => `
+                  <tr>
+                    <td>${i + 1}</td>
+                    <td>${r[0]}</td>
+                    <td>${r[1]}</td>
+                    <td>${r[2]}</td>
+                    <td>${r[3]}</td>
+                    <td>${r[4]}</td>
+                    <td>${r[5]}</td>
+                    <td>${money(r[6])}</td>
+                    <td>${money(r[7])}</td>
+                  </tr>
+                `).join("")
+            }
+          </tbody>
+        `;
+        host.appendChild(t);
+
+        const totals = document.createElement("table");
+        totals.className = "totalsTable";
+        totals.innerHTML = `
+          <tr>
+            <td>Total OB BOT: ${money(totalOB)}</td>
+            <td>Total CB BOT: ${money(totalCB)}</td>
+            <td>Total Sales BOT: ${money(totalSales)}</td>
+            <td>Total Sales Value: ${money(totalSV)}</td>
+            <td>Total CB Value: ${money(totalCBV)}</td>
+          </tr>
+        `;
+        host.appendChild(totals);
+      });
+
+      const t9Title = document.createElement("h2");
+      t9Title.className = "groupTitle";
+      t9Title.textContent = "(IMSF)";
+      host.appendChild(t9Title);
+
+      const t9Totals = document.createElement("table");
+      t9Totals.className = "totalsTable";
+      t9Totals.innerHTML = `
+        <tr>
+          <td>Total OB BOT: ${money(t9OB)}</td>
+          <td>Total CB BOT: ${money(t9CB)}</td>
+          <td>Total Sales BOT: ${money(t9Sales)}</td>
+          <td>Total Sales Value: ${money(t9SV)}</td>
+          <td>Total CB Value: ${money(t9CBV)}</td>
+        </tr>
+      `;
+      host.appendChild(t9Totals);
+
+      const t10Title = document.createElement("h2");
+      t10Title.className = "groupTitle";
+      t10Title.textContent = "(BEER)";
+      host.appendChild(t10Title);
+
+      const t10Totals = document.createElement("table");
+      t10Totals.className = "totalsTable";
+      t10Totals.innerHTML = `
+        <tr>
+          <td>Total OB BOT: ${money(t10OB)}</td>
+          <td>Total CB BOT: ${money(t10CB)}</td>
+          <td>Total Sales BOT: ${money(t10Sales)}</td>
+          <td>Total Sales Value: ${money(t10SV)}</td>
+          <td>Total CB Value: ${money(t10CBV)}</td>
+        </tr>
+      `;
+      host.appendChild(t10Totals);
+
+      const totalTitle = document.createElement("h2");
+      totalTitle.className = "groupTitle";
+      totalTitle.textContent = "Total(IMSF&BEER)";
+      host.appendChild(totalTitle);
+
+      const totalTable = document.createElement("table");
+      totalTable.className = "totalsTable";
+
+      const totalOB = t9OB + t10OB;
+      const totalCB = t9CB + t10CB;
+      const totalSales = t9Sales + t10Sales;
+      const totalSV = t9SV + t10SV;
+      const totalCBV = t9CBV + t10CBV;
+
+      totalTable.innerHTML = `
+        <tr>
+          <td>Total OB BOT: ${money(totalOB)}</td>
+          <td>Total CB BOT: ${money(totalCB)}</td>
+          <td>Total Sales BOT: ${money(totalSales)}</td>
+          <td>Total Sales Value: ${money(totalSV)}</td>
+          <td>Total CB Value: ${money(totalCBV)}</td>
+        </tr>
+      `;
+      host.appendChild(totalTable);
+    }
+
+    const editAllBtn = document.getElementById("editAllBtn");
+    const saveAllBtn = document.getElementById("saveAllBtn");
+    let currentEditGroupIndex = null;
+
+    editAllBtn.addEventListener("click", function () {
+      const tableNoStr = prompt("Enter Table Number (1-8) to Edit All OB & CB:");
+      if (tableNoStr === null) return;
+      const tableNo = parseInt(tableNoStr, 10);
+      if (!Number.isInteger(tableNo) || tableNo < 1 || tableNo > 8) {
+        alert("Please enter a number from 1 to 8.");
+        return;
+      }
+      const host = document.getElementById("groups");
+      const allTables = host.querySelectorAll("table");
+      const mainTableIndex = (tableNo - 1) * 2;
+      const table = allTables[mainTableIndex];
+      if (!table) { alert("Table not found."); return; }
+      currentEditGroupIndex = tableNo - 1;
+      for (let i = 1; i < table.rows.length; i++) {
+        const row = table.rows[i];
+        const obCell = row.cells[3];
+        const cbCell = row.cells[4];
+        if (!obCell || !cbCell) continue;
+        obCell.contentEditable = "true";
+        cbCell.contentEditable = "true";
+        obCell.classList.add("editing");
+        cbCell.classList.add("editing");
+      }
+      editAllBtn.style.display = "none";
+      saveAllBtn.style.display = "inline-block";
+    });
+
+    saveAllBtn.addEventListener("click", function () {
+      if (currentEditGroupIndex === null) return;
+      const host = document.getElementById("groups");
+      const allTables = host.querySelectorAll("table");
+      const mainTableIndex = currentEditGroupIndex * 2;
+      const table = allTables[mainTableIndex];
+      if (!table) return;
+      const g = GROUPS[currentEditGroupIndex];
+      const groupRows = records
+        .map((rec, idx) => ({ rec, idx }))
+        .filter(x => g.filter(x.rec))
+        .sort((a, b) => Number(a.rec[5]) - Number(b.rec[5]));
+      for (let i = 1; i < table.rows.length && i <= groupRows.length; i++) {
+        const rowEl = table.rows[i];
+        const obCell = rowEl.cells[3];
+        const cbCell = rowEl.cells[4];
+        if (!obCell || !cbCell) continue;
+        obCell.contentEditable = "false";
+        cbCell.contentEditable = "false";
+        obCell.classList.remove("editing");
+        cbCell.classList.remove("editing");
+        const newOB = parseFloat(obCell.textContent || 0);
+        const newCB = parseFloat(cbCell.textContent || 0);
+        const recIndex = groupRows[i - 1].idx;
+        const rec = records[recIndex];
+        rec[2] = newOB;
+        rec[3] = newCB;
+        rec[4] = newOB - newCB;
+        rec[6] = rec[5] * rec[4];
+        rec[7] = rec[5] * rec[3];
+      }
+      saveData();
+      renderGroupedTables();
+      currentEditGroupIndex = null;
+      saveAllBtn.style.display = "none";
+      editAllBtn.style.display = "inline-block";
+    });
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      const brand = brandInput.value.trim();
+      const ml = parseFloat(mlSelect.value || 0);
+      const ob = parseFloat(document.getElementById("ob").value || 0);
+      const cb = parseFloat(document.getElementById("cb").value || 0);
+      const price = parseFloat(priceInput.value || 0);
+      if (!brand || !ml || !price) {
+        alert("Please select Brand + ML. Price will auto-fill. If price is empty, add that brand+ml in PRICELIST.");
+        return;
+      }
+      const sales = ob - cb;
+      const sv = price * sales;
+      const cbv = price * cb;
+
+      const newRecord = [brand, ml, ob, cb, sales, price, sv, cbv];
+      const groupIndex = GROUPS.findIndex(g => g.filter(newRecord));
+      if (groupIndex === -1) {
+        alert("This record doesn't match any table rules.");
+        return;
+      }
+
+      const editIndexStr = localStorage.getItem("editIndex");
+      const isEditing = editIndexStr !== null;
+      const editIndex = isEditing ? parseInt(editIndexStr, 10) : -1;
+
+      if (isEditing) {
+        records[editIndex] = newRecord;
+        localStorage.removeItem("editIndex");
+        alert("Row updated successfully.");
+      } else {
+        const duplicateInSameTable = records.some(r =>
+          GROUPS[groupIndex].filter(r) && r[0].toLowerCase() === brand.toLowerCase()
+        );
+        if (duplicateInSameTable) {
+          alert(`"${brand}" already exists in Table ${groupIndex + 1}. Not added.`);
+          return;
+        }
+        records.push(newRecord);
+      }
+
+      saveData();
+      renderGroupedTables();
+      form.reset();
+      brandInput.setAttribute("list", "suggestions");
+      datalist.innerHTML = "";
+    });
+
+    const eraseBtn = document.getElementById("eraseBtn");
+    const eraseFormDiv = document.getElementById("eraseForm");
+    const eraseSubmit = document.getElementById("eraseSubmit");
+
+    eraseBtn.addEventListener("click", () => {
+      eraseFormDiv.style.display = eraseFormDiv.style.display === "none" ? "block" : "none";
+    });
+
+    eraseSubmit.addEventListener("click", () => {
+      const tno = parseInt(document.getElementById("eraseTableNo").value, 10);
+      const rno = parseInt(document.getElementById("eraseRowNo").value, 10);
+      if (!Number.isInteger(tno) || tno < 1 || tno > 8) {
+        alert("Enter table number 1 to 8");
+        return;
+      }
+      if (!Number.isInteger(rno) || rno < 1) {
+        alert("Enter row number N (1,2,3...)");
+        return;
+      }
+      const g = GROUPS[tno - 1];
+      const tableRows = records
+        .map((rec, idx) => ({ rec, idx }))
+        .filter(x => g.filter(x.rec))
+        .sort((a, b) => Number(a.rec[5]) - Number(b.rec[5]));
+      if (tableRows.length === 0) {
+        alert("No records in this table");
+        return;
+      }
+      if (rno > tableRows.length) {
+        alert(`This table has only ${tableRows.length} rows`);
+        return;
+      }
+      const removeIndex = tableRows[rno - 1].idx;
+      records.splice(removeIndex, 1);
+      saveData();
+      renderGroupedTables();
+      document.getElementById("eraseTableNo").value = "";
+      document.getElementById("eraseRowNo").value = "";
+    });
+
+    document.getElementById("muhil").addEventListener("click", function () {
+      const tableNoStr = prompt("Enter Table Number to edit:");
+      if (tableNoStr === null) return;
+      const rowNoStr = prompt("Enter Row Number to edit:");
+      if (rowNoStr === null) return;
+      const tableNo = parseInt(tableNoStr, 10);
+      const rowNo = parseInt(rowNoStr, 10);
+      if (!Number.isInteger(tableNo) || !Number.isInteger(rowNo) || tableNo < 1 || tableNo > 8 || rowNo < 1) {
+        alert("Invalid table or row number.");
+        return;
+      }
+      const groupIndex = tableNo - 1;
+      const g = GROUPS[groupIndex];
+      const groupRecords = records
+        .map((r, idx) => ({ r, idx }))
+        .filter(obj => g.filter(obj.r))
+        .sort((a, b) => Number(a.r[5]) - Number(b.r[5]));
+      if (groupRecords.length === 0) {
+        alert("No records in this table.");
+        return;
+      }
+      if (rowNo > groupRecords.length) {
+        alert(`This table has only ${groupRecords.length} rows.`);
+        return;
+      }
+      const target = groupRecords[rowNo - 1];
+      const globalIndex = target.idx;
+      const row = target.r;
+      brandInput.value = row[0];
+      mlSelect.value = row[1];
+      document.getElementById("ob").value = row[2];
+      document.getElementById("cb").value = row[3];
+      priceInput.value = row[5];
+      localStorage.setItem("editIndex", globalIndex);
+      alert("Row loaded. Edit values and press Submit to save.");
+    });
+
+    function clearAll() {
+      const ok = confirm("Do you want to clear all records?");
+      if (!ok) return;
+      const text = prompt('Type "yes" to clear all records:');
+      if (text === null) return;
+      if (text.toLowerCase() !== "yes") {
+        alert("Clear cancelled.");
+        return;
+      }
+      records = [];
+      localStorage.removeItem(STORAGEKEY);
+      renderGroupedTables();
+    }
+    window.clearAll = clearAll;
+
+    /* ---------------- GOOGLE LOGIN + FIRESTORE ---------------- */
 const firebaseConfig = {
   apiKey: "AIzaSyCYBSq_NTLy0lqcL1bXd3iGtjr16fZEvBA",
   authDomain: "store-45bb2.firebaseapp.com",
@@ -143,198 +793,52 @@ const firebaseConfig = {
     const provider = new firebase.auth.GoogleAuthProvider();
 
     let currentUser = null;
-    let records = JSON.parse(localStorage.getItem("calcrecords")) || [];
 
-    // --- STEP 2: AUTH LOGIC (Google login) ---  [web:69][web:123]
     auth.onAuthStateChanged(user => {
+      const status = document.getElementById("userStatus");
+      const loginBtn = document.getElementById("loginBtn");
+      const logoutBtn = document.getElementById("logoutBtn");
       if (user) {
         currentUser = user;
-        document.getElementById("userStatus").innerText = "User: " + user.email;
-        document.getElementById("loginBtn").style.display = "none";
-        document.getElementById("logoutBtn").style.display = "inline";
+        status.textContent = "User: " + (user.email || user.uid);
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "inline-block";
       } else {
         currentUser = null;
-        document.getElementById("userStatus").innerText = "Not Logged In";
-        document.getElementById("loginBtn").style.display = "inline";
-        document.getElementById("logoutBtn").style.display = "none";
+        status.textContent = "Not Logged In";
+        loginBtn.style.display = "inline-block";
+        logoutBtn.style.display = "none";
       }
     });
 
-    document.getElementById("loginBtn").onclick  = () => auth.signInWithPopup(provider);
+    document.getElementById("loginBtn").onclick = () => auth.signInWithPopup(provider);
     document.getElementById("logoutBtn").onclick = () => auth.signOut();
 
-    // ---------- PRICE LIST (short; add full list as you need) ----------
-    const PRICELIST = [
-      { brand: "Old king xxxx rum", ml: 180, price: 140 },
-      { brand: "Old king xxxx rum", ml: 375, price: 280 },
-      { brand: "Old king xxxx rum", ml: 750, price: 560 },
-      // add your full list here...
-    ];
-
-    const BRANDS = [...new Set(PRICELIST.map(x => x.brand))].sort();
-
-    // ---------- GROUPS ----------
-    const GROUPS = [
-      { key: "180_140", title: "Table 1: 180 ml (Price <= 140)", filter: r => r[1] === 180 && r[5] <= 140 },
-      { key: "180_170", title: "Table 2: 180 ml (Price = 170)", filter: r => r[1] === 180 && r[5] === 170 },
-      { key: "180_gt200", title: "Table 3: 180 ml (Price >= 200)", filter: r => r[1] === 180 && r[5] >= 200 },
-      { key: "375", title: "Table 4: 375 ml", filter: r => r[1] === 375 },
-      { key: "750", title: "Table 5: 750 ml", filter: r => r[1] === 750 },
-      { key: "1000", title: "Table 6: 1000 ml", filter: r => r[1] === 1000 },
-      { key: "650", title: "Table 7: 650 ml", filter: r => r[1] === 650 },
-      { key: "500", title: "Table 8: 500 ml", filter: r => r[1] === 500 },
-    ];
-
-    // ---------- Helpers ----------
-    function money(n) { return (Number(n) || 0).toFixed(2); }
-
-    function saveAndRender() {
-      localStorage.setItem("calcrecords", JSON.stringify(records));
-      renderGroupedTables();
-    }
-
-    function renderBrandOptions(filterText) {
-      const datalist = document.getElementById("suggestions");
-      datalist.innerHTML = "";
-      const q = (filterText || "").toLowerCase();
-      BRANDS
-        .filter(b => b.toLowerCase().includes(q))
-        .slice(0, 30)
-        .forEach(b => {
-          const opt = document.createElement("option");
-          opt.value = b;
-          datalist.appendChild(opt);
-        });
-    }
-
-    function autoApplyPrice() {
-      const brand = document.getElementById("brand").value.trim();
-      const ml = Number(document.getElementById("ml").value || 0);
-      if (!brand || !ml) return;
-      const match = PRICELIST.find(x => x.brand === brand && x.ml === ml);
-      document.getElementById("price").value = match ? match.price : "";
-    }
-
-    // ---------- Render tables ----------
-    function renderGroupedTables() {
-      const host = document.getElementById("groups");
-      host.innerHTML = "";
-
-      let t9OB = 0, t9CB = 0, t9Sales = 0, t9SV = 0, t9CBV = 0;
-      let t10OB = 0, t10CB = 0, t10Sales = 0, t10SV = 0, t10CBV = 0;
-
-      GROUPS.forEach((g, idx) => {
-        const rows = records.filter(g.filter).slice().sort((a, b) => a[5] - b[5]);
-
-        const totalOB  = rows.reduce((a,r) => a + (r[2] || 0), 0);
-        const totalCB  = rows.reduce((a,r) => a + (r[3] || 0), 0);
-        const totalS   = rows.reduce((a,r) => a + (r[4] || 0), 0);
-        const totalSV  = rows.reduce((a,r) => a + (r[6] || 0), 0);
-        const totalCBV = rows.reduce((a,r) => a + (r[7] || 0), 0);
-
-        if (idx <= 5) {
-          t9OB  += totalOB;  t9CB  += totalCB;  t9Sales += totalS;  t9SV += totalSV;  t9CBV += totalCBV;
-        } else {
-          t10OB += totalOB; t10CB += totalCB; t10Sales += totalS; t10SV += totalSV; t10CBV += totalCBV;
-        }
-
-        const h2 = document.createElement("h2");
-        h2.className = "groupTitle";
-        h2.innerText = g.title;
-        host.appendChild(h2);
-
-        let html = `<table><thead><tr>
-          <th>S.No</th><th>Brand</th><th>ML</th><th>OB</th><th>CB</th>
-          <th>Sales</th><th>Price</th><th>Sales Value</th><th>CB Value</th>
-        </tr></thead><tbody>`;
-
-        if (rows.length === 0) {
-          html += `<tr><td colspan="9" style="text-align:center">No Data</td></tr>`;
-        } else {
-          rows.forEach((r,i) => {
-            html += `<tr>
-              <td>${i+1}</td>
-              <td>${r[0]}</td>
-              <td>${r[1]}</td>
-              <td>${r[2]}</td>
-              <td>${r[3]}</td>
-              <td>${r[4]}</td>
-              <td>${r[5]}</td>
-              <td>${money(r[6])}</td>
-              <td>${money(r[7])}</td>
-            </tr>`;
-          });
-        }
-        html += `</tbody></table>`;
-        host.insertAdjacentHTML("beforeend", html);
-
-        const totals = document.createElement("table");
-        totals.className = "totalsTable";
-        totals.innerHTML = `
-          <tr>
-            <td>Total OB BOT: ${money(totalOB)}</td>
-            <td>Total CB BOT: ${money(totalCB)}</td>
-            <td>Total Sales BOT: ${money(totalS)}</td>
-            <td>Total Sales Value: ${money(totalSV)}</td>
-            <td>Total CB Value: ${money(totalCBV)}</td>
-          </tr>`;
-        host.appendChild(totals);
-      });
-
-      // IMSF and BEER + total could be added here similarly if you want
-    }
-
-    // ---------- FORM SUBMIT ----------
-    document.getElementById("information").onsubmit = function(e) {
-      e.preventDefault();
-      const brand = document.getElementById("brand").value.trim();
-      const ml    = Number(document.getElementById("ml").value || 0);
-      const ob    = Number(document.getElementById("ob").value || 0);
-      const cb    = Number(document.getElementById("cb").value || 0);
-      const price = Number(document.getElementById("price").value || 0);
-      if (!brand || !ml || !price) {
-        alert("Brand, ML, and Price are required.");
-        return;
-      }
-      const sales = ob - cb;
-      records.push([brand, ml, ob, cb, sales, price, price * sales, price * cb]);
-      saveAndRender();
-      this.reset();
-    };
-
-    // ---------- NEXT DAY: OB = old CB, CB = 0 ----------
-    document.getElementById("nextDayBtn").onclick = function () {
+    document.getElementById("nextDayBtn").onclick = () => {
       if (records.length === 0) return alert("Table is empty.");
-      if (!confirm("Next Day? OB = previous CB, CB reset to 0, sales recalculated.")) return;
-
+      if (!confirm("Next Day?\nOB = previous CB, CB reset to 0, sales recalculated.")) return;
       records = records.map(r => {
         const brand = r[0];
         const ml    = r[1];
-        const oldCB = r[3] || 0;
-        const price = r[5] || 0;
-
-        const newOB = oldCB;    // OB = old CB
-        const newCB = 0;        // CB reset to 0
+        const oldCB = Number(r[3] || 0);
+        const price = Number(r[5] || 0);
+        const newOB = oldCB;
+        const newCB = 0;
         const sales = newOB - newCB;
         const sv    = price * sales;
         const cbv   = price * newCB;
-
         return [brand, ml, newOB, newCB, sales, price, sv, cbv];
       });
-
-      saveAndRender();
+      saveData();
+      renderGroupedTables();
       alert("Next day applied.");
     };
 
-    // ---------- STORE TO CLOUD ----------
-    async function saveToCloud() {
-      if (!currentUser) return alert("Please Login first!");
-      if (records.length === 0) return alert("No data to save.");
-
+    async function storeToCloud() {
+      if (!currentUser) return alert("Please login first.");
+      if (records.length === 0) return alert("No data to store.");
       const listName = prompt("Enter name for this report (e.g. date):", new Date().toLocaleDateString());
       if (!listName) return;
-
-      // convert inner arrays to objects to avoid nested-array issues [web:113]
       const dataForFirestore = records.map(r => ({
         brand: r[0],
         ml: r[1],
@@ -345,7 +849,6 @@ const firebaseConfig = {
         sv: r[6],
         cbv: r[7]
       }));
-
       try {
         await db.collection("users")
           .doc(currentUser.uid)
@@ -355,106 +858,76 @@ const firebaseConfig = {
             data: dataForFirestore,
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
           });
-        alert("Saved to Cloud successfully!");
+        alert("Saved to cloud.");
       } catch (e) {
         console.error(e);
         alert("Error saving: " + e.message);
       }
     }
+    document.getElementById("storeCloudBtn").onclick = () => { storeToCloud(); };
 
-    document.getElementById("storeCloudBtn").onclick = () => {
-      saveToCloud();
-    };
-
-    // ---------- LIST BUTTON: show & load cloud reports ----------
-    async function showCloudList() {
-      if (!currentUser) return alert("Please Login first!");
-      document.getElementById("listModal").style.display = "block";
+    async function showCloudLists() {
+      if (!currentUser) return alert("Please login first.");
+      const modal = document.getElementById("listModal");
       const listDiv = document.getElementById("cloudDataList");
-      listDiv.innerHTML = "Fetching...";
-
+      modal.style.display = "block";
+      listDiv.textContent = "Loading...";
       try {
-        const snapshot = await db.collection("users")
+        const snap = await db.collection("users")
           .doc(currentUser.uid)
           .collection("reports")
           .orderBy("timestamp", "desc")
           .get();
-
         listDiv.innerHTML = "";
-        if (snapshot.empty) {
-          listDiv.innerHTML = "No cloud records found.";
+        if (snap.empty) {
+          listDiv.textContent = "No cloud reports found.";
           return;
         }
-
-        snapshot.forEach(docSnap => {
+        snap.forEach(docSnap => {
           const d = docSnap.data();
-          const div = document.createElement("div");
-          div.style.margin = "10px 0";
           const count = (d.data || []).length;
-          div.innerHTML = `<strong>${d.name}</strong> (${count} items)
-            <button onclick="loadCloudRecord('${docSnap.id}')">Load</button>`;
+          const div = document.createElement("div");
+          div.style.margin = "8px 0";
+          div.innerHTML = `<strong>${d.name || "(no name)"}</strong> (${count} rows)
+            <button onclick="loadCloudReport('${docSnap.id}')">Load</button>`;
           listDiv.appendChild(div);
         });
       } catch (e) {
         console.error(e);
-        listDiv.innerHTML = "Error loading list: " + e.message;
+        listDiv.textContent = "Error: " + e.message;
       }
     }
+    document.getElementById("listBtn").onclick = () => { showCloudLists(); };
 
-    document.getElementById("listBtn").onclick = () => showCloudList();
-
-    window.loadCloudRecord = async (id) => {
-      if (!currentUser) return alert("Please Login first!");
-      if (!confirm("Overwrite local table with this cloud data?")) return;
-
+    window.loadCloudReport = async (id) => {
+      if (!currentUser) return alert("Please login first.");
+      if (!confirm("Overwrite current table with this cloud report?")) return;
       try {
         const docSnap = await db.collection("users")
           .doc(currentUser.uid)
           .collection("reports")
           .doc(id)
           .get();
-
         if (!docSnap.exists) {
           alert("Report not found.");
           return;
         }
-
         const d = docSnap.data();
         const recs = d.data || [];
-
-        // convert back to arrays
         records = recs.map(o => [
           o.brand, o.ml, o.ob, o.cb, o.sales, o.price, o.sv, o.cbv
         ]);
-
-        saveAndRender();
+        saveData();
+        renderGroupedTables();
         document.getElementById("listModal").style.display = "none";
       } catch (e) {
         console.error(e);
-        alert("Error loading record: " + e.message);
+        alert("Error loading: " + e.message);
       }
     };
 
-    // ---------- CLEAR ALL ----------
-    function clearAll() {
-      if (confirm("Clear local table?") && prompt("Type 'yes' to confirm") === "yes") {
-        records = [];
-        saveAndRender();
-      }
-    }
-    window.clearAll = clearAll;
-
-    // ---------- Brand suggestions + price auto ----------
-    document.getElementById("brand").addEventListener("input", e => {
-      renderBrandOptions(e.target.value);
-      autoApplyPrice();
-    });
-    document.getElementById("brand").addEventListener("focus", e => {
-      renderBrandOptions(e.target.value);
-    });
-    document.getElementById("ml").addEventListener("change", autoApplyPrice);
-
-    // Initial render
+    loadData();
+    renderBrandOptions("");
     renderGroupedTables();
   </script>
 </body>
