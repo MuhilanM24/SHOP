@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>SHOP 2605 – Login + Calculator</title>
-
+  <title>Ⓜ️GROUPS</title>
   <style>
     body { background: aquamarine; font-family: Arial, sans-serif; }
     h1 { text-align: center; margin-top: 10px; }
@@ -36,9 +35,15 @@
     #muhil { background: green; color: #fff; padding: 8px 14px; border: 0; cursor: pointer; }
     input, select { padding: 6px; }
 
+    .editing { background: #ffeeba; }
+
+    #userInfo {
+      margin: 5px 10px;
+      text-align: right;
+      font-weight: bold;
+    }
+
     @media print {
-      #loginSection,
-      #authBox,
       form,
       #printBtn,
       #muhil,
@@ -49,534 +54,506 @@
       #eraseForm,
       #eraseBtn,
       #eraseSubmit,
-      #saveCloudBtn,
-      #loadCloudBtn,
-      #uploadBox {
+      #storeCloudBtn,
+      #nextDayBtn,
+      #listBtn,
+      #userInfo,
+      #g_id_onload,
+      .g_id_signin {
         display: none !important;
       }
-      body { background: white !important; }
-      table { width: 100% !important; max-width: 100% !important; }
-      .totalsTable { page-break-inside: avoid; }
-      h2 { page-break-after: avoid; }
-    }
 
-    /* Login card entrance */
-    #loginSection {
-      animation: fadeSlideIn 0.8s ease-out;
-    }
-    @keyframes fadeSlideIn {
-      from { opacity: 0; transform: translateY(20px) scale(0.98); }
-      to   { opacity: 1; transform: translateY(0) scale(1); }
-    }
+      body {
+        background: white !important;
+      }
 
-    /* Google login button hover & pulse */
-    #googleLoginBtn {
-      position: relative;
-      overflow: hidden;
-      border-radius: 999px;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      border: none;
-      background:#4285f4;
-      color:#fff;
-    }
-    #googleLoginBtn:hover {
-      transform: translateY(-2px) scale(1.03);
-      box-shadow: 0 8px 18px rgba(0,0,0,0.25);
-    }
-    #googleLoginBtn::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle, rgba(255,255,255,0.4) 10%, transparent 40%);
-      opacity: 0;
-      transform: scale(0);
-      transition: transform 0.35s ease, opacity 0.35s ease;
-    }
-    #googleLoginBtn:active::after {
-      opacity: 1;
-      transform: scale(2);
-    }
+      table {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
 
-    button,
-    input[type="submit"] {
-      transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
-    }
-    button:hover,
-    input[type="submit"]:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-    }
+      .totalsTable {
+        page-break-inside: avoid;
+      }
 
-    #printBtn,
-    #qwe {
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    #printBtn:hover,
-    #qwe:hover {
-      transform: scale(1.04);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-    }
-
-    #appSection {
-      animation: fadeInApp 0.45s ease-out;
-    }
-    @keyframes fadeInApp {
-      from { opacity: 0; transform: translateY(8px); }
-      to   { opacity: 1; transform: translateY(0); }
+      h2 {
+        page-break-after: avoid;
+      }
     }
   </style>
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
-  <script>
-    // Replace with your config
-const firebaseConfig = {
-  apiKey: "AIzaSyBqtTwZJfNYF48MK-R4uF60FkuEuGKCEJY",
-  authDomain: "shop-987b6.firebaseapp.com",
-  projectId: "shop-987b6",
-  storageBucket: "shop-987b6.firebasestorage.app",
-  messagingSenderId: "1022735148857",
-  appId: "1:1022735148857:web:5d6f667191abf18f1eeae8",
-  measurementId: "G-NPHYKZ1VM5"
-};
-
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const storage = firebase.storage();
-    const db = firebase.firestore();
-    const provider = new firebase.auth.GoogleAuthProvider();
-
-    window.addEventListener("load", () => {
-      const loginSection = document.getElementById("loginSection");
-      const appSection = document.getElementById("appSection");
-      const userEmailSpan = document.getElementById("userEmail");
-
-      appSection.style.display = "none";
-      loginSection.style.display = "block";
-
-      auth.onAuthStateChanged(user => {
-        if (user) {
-          userEmailSpan.textContent = user.email;
-          loginSection.style.display = "none";
-          appSection.style.display = "block";
-        } else {
-          userEmailSpan.textContent = "";
-          loginSection.style.display = "block";
-          appSection.style.display = "none";
-        }
-      });
-
-      document.getElementById("googleLoginBtn").addEventListener("click", () => {
-        auth.signInWithPopup(provider).catch(err => {
-          alert("Login failed: " + err.message);
-        });
-      });
-
-      document.getElementById("logoutBtn").addEventListener("click", () => {
-        auth.signOut();
-      });
-    });
-  </script>
+  <!-- Google Identity Services (Sign in with Google) -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 
 <body>
   <h1>SHOP NO:2605</h1>
 
-  <!-- LOGIN SECTION -->
-  <div id="loginSection" style="
-    text-align:center;
-    margin:40px auto;
-    max-width:320px;
-    padding:24px 20px;
-    background: rgba(255,255,255,0.85);
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-  ">
-    <h2>Please login with Google</h2>
-    <button id="googleLoginBtn" style="padding:10px 24px;font-size:16px;">
-      Login with Google
-    </button>
-  </div>
+  <!-- Google login status -->
+  <div id="userInfo">Not signed in</div>
 
-  <!-- APP SECTION -->
-  <div id="appSection" style="display:none;">
-    <div id="authBox" style="text-align:center;margin:10px 0;">
-      <div>
-        Logged in as: <span id="userEmail"></span>
-        <button id="logoutBtn" type="button">Logout</button>
-      </div>
-    </div>
+  <!-- Google Sign-In button -->
+  <div id="g_id_onload"
+       data-client_id="YOUR_WEB_CLIENT_ID.apps.googleusercontent.com"
+       data-callback="handleCredentialResponse"
+       data-auto_prompt="false"></div>
+  <div class="g_id_signin" data-type="standard"></div>
 
-    <!-- Cloud Storage upload (file) -->
-    <div id="uploadBox" style="text-align:center;margin:10px 0;">
-      <input type="file" id="fileInput" />
-      <button type="button" id="uploadBtn">Upload file to Storage</button>
-      <div id="uploadStatus"></div>
-    </div>
+  <form id="information">
+    <label for="brand">Brand name</label>
+    <input type="text" id="brand" placeholder="Type brand name..." autocomplete="off" />
+    <datalist id="suggestions"></datalist>
 
-    <!-- Save/Load tables to Firestore -->
-    <div style="text-align:center;margin:10px 0;">
-      <button type="button" id="saveCloudBtn">Save tables to Cloud</button>
-      <button type="button" id="loadCloudBtn">Load tables from Cloud</button>
-    </div>
+    <br><br>
 
-    <!-- CALCULATOR FORM -->
-    <form id="information">
-      <label for="brand">Brand name</label>
-      <input type="text" id="brand" placeholder="Type brand name..." autocomplete="off" />
-      <datalist id="suggestions"></datalist>
+    <label for="ml">ML</label>
+    <select id="ml" name="ml">
+      <option value="">select</option>
+      <option value="180">180 ml</option>
+      <option value="325">325 ml</option>
+      <option value="375">375 ml</option>
+      <option value="500">500 ml</option>
+      <option value="650">650 ml</option>
+      <option value="750">750 ml</option>
+      <option value="1000">1000 ml</option>
+    </select>
 
-      <br><br>
+    <br><br>
 
-      <label for="ml">ML</label>
-      <select id="ml" name="ml">
-        <option value="">select</option>
-        <option value="180">180 ml</option>
-        <option value="325">325 ml</option>
-        <option value="375">375 ml</option>
-        <option value="500">500 ml</option>
-        <option value="650">650 ml</option>
-        <option value="750">750 ml</option>
-        <option value="1000">1000 ml</option>
-      </select>
+    <label for="ob">Enter opening balance</label>
+    <input type="number" id="ob" name="ob" placeholder="Enter the number" />
 
-      <br><br>
+    <br><br>
 
-      <label for="ob">Enter opening balance</label>
-      <input type="number" id="ob" name="ob" placeholder="Enter the number" />
+    <label for="cb">Enter closing balance</label>
+    <input type="number" id="cb" name="cb" placeholder="Enter the number" />
 
-      <br><br>
+    <br><br>
 
-      <label for="cb">Enter closing balance</label>
-      <input type="number" id="cb" name="cb" placeholder="Enter the number" />
+    <label for="price">price</label>
+    <input type="number" id="price" name="price" placeholder="price" />
 
-      <br><br>
+    <br><br>
 
-      <label for="price">price</label>
-      <input type="number" id="price" name="price" placeholder="price" />
+    <input type="reset" value="clear" />
+    <input type="submit" value="submit" />
 
-      <br><br>
+    <br><br><hr><hr>
 
-      <input type="reset" value="clear" />
-      <input type="submit" value="submit" />
+    <button type="button" id="muhil">EDIT</button>
 
-      <br><br><hr><hr>
+    <br><br><hr>
+    <button type="button" id="editAllBtn">Edit All</button>
+    <button type="button" id="saveAllBtn" style="display:none;">Save</button>
 
-      <button type="button" id="muhil">EDIT</button>
+    <br><br><hr>
+    <button type="button" id="storeCloudBtn">Store to Cloud</button>
+    <button type="button" id="nextDayBtn">Next Day</button>
+    <button type="button" id="listBtn">Cloud Lists</button>
 
-      <br><br><hr>
-      <button type="button" id="editAllBtn">Edit All</button>
-      <button type="button" id="saveAllBtn" style="display:none;">Save</button>
+    <br><br><hr>
+    <button type="button" id="qwe" onclick="clearAll()">Clear table</button>
+    <br><br><hr>
+    <button type="button" id="printBtn" onclick="printReport()">Print / Save PDF</button>
 
-      <br><br><hr>
+  </form>
 
-      <button type="button" id="qwe" onclick="clearAll()">Clear table</button>
-      <br><br><hr>
-      <button type="button" id="printBtn" onclick="printReport()">Print / Save PDF</button>
-    </form>
+  <!-- 8 tables will always be shown here -->
+  <div id="groups"></div>
 
-    <div id="groups"></div>
+  <!-- Erase row UI -->
+  <div id="eraseBox" style="width:95%;max-width:1100px;margin:10px auto;text-align:center;">
+    <button type="button" id="eraseBtn" class="qwe">Erase Row</button>
 
-    <div id="eraseBox" style="width:95%;max-width:1100px;margin:10px auto;text-align:center;">
-      <button type="button" id="eraseBtn" class="qwe">Erase Row</button>
-
-      <div id="eraseForm" style="display:none;margin-top:10px;">
-        <input type="number" id="eraseTableNo" min="1" max="8" placeholder="Table no (1-8)">
-        <input type="number" id="eraseRowNo" min="1" placeholder="Row no (N)">
-        <button type="button" id="eraseSubmit" class="muhil">Submit</button>
-      </div>
+    <div id="eraseForm" style="display:none;margin-top:10px;">
+      <input type="number" id="eraseTableNo" min="1" max="8" placeholder="Table no (1-8)">
+      <input type="number" id="eraseRowNo" min="1" placeholder="Row no (N)">
+      <button type="button" id="eraseSubmit" class="muhil">Submit</button>
     </div>
   </div>
 
-  <script>
-  // FILE UPLOAD TO STORAGE
-  const fileInput = document.getElementById("fileInput");
-  const uploadBtn = document.getElementById("uploadBtn");
-  const uploadStatus = document.getElementById("uploadStatus");
+  <!-- MAIN LOGIC + FIREBASE -->
+  <script type="module">
+    import {
+      initializeApp
+    } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      getDocs,
+      getDoc,
+      doc,
+      setDoc,
+      query,
+      where
+    } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-  uploadBtn.addEventListener("click", () => {
-    const user = auth.currentUser;
-    if (!user) {
-      alert("Please login again.");
-      return;
+    // ---------- Firebase config (FILL THIS) ----------
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "SENDER_ID",
+      appId: "APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // ---------- Google login state ----------
+    let currentUser = null;      // { uid, name, email }
+    let records = [];            // current day's data
+    let currentListId = null;    // Firestore doc id for this list (null = not saved yet)
+
+    // expose handler for Google Identity callback
+    window.handleCredentialResponse = function(response) {
+      const payload = decodeJWT(response.credential);
+      currentUser = {
+        uid: payload.sub,
+        name: payload.name,
+        email: payload.email
+      };
+      document.getElementById("userInfo").textContent =
+        "Signed in as: " + currentUser.name + " (" + currentUser.email + ")";
+    };
+
+    function decodeJWT(token) {
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
+      );
+      return JSON.parse(jsonPayload);
     }
 
-    const file = fileInput.files[0];
-    if (!file) {
-      alert("Choose a file first.");
-      return;
-    }
-
-    const storageRef = storage.ref(`uploads/${user.uid}/${file.name}`);
-    const task = storageRef.put(file);
-
-    task.on(
-      "state_changed",
-      snapshot => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        uploadStatus.textContent = `Upload: ${progress.toFixed(0)}%`;
-      },
-      error => {
-        uploadStatus.textContent = "Error: " + error.message;
-      },
-      () => {
-        task.snapshot.ref.getDownloadURL().then(url => {
-          uploadStatus.textContent = "Done. URL: " + url;
-          console.log("File available at", url);
-        });
-      }
-    );
-  });
-
-  /* ---------- SAVE / LOAD TABLES TO FIRESTORE (no nested arrays) ---------- */
-
-  async function saveToCloud() {
-    const user = auth.currentUser;
-    if (!user) {
-      alert("Login first.");
-      return;
-    }
-
-    // Convert 2D array -> array of objects
-    const recordsForFirestore = records.map(r => ({
-      brand: r[0],
-      ml: r[1],
-      ob: r[2],
-      cb: r[3],
-      sales: r[4],
-      price: r[5],
-      sv: r[6],
-      cbv: r[7]
-    }));
-
-    try {
-      await db.collection("shops").doc(user.uid).set({
-        records: recordsForFirestore,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      alert("Tables saved to cloud (Firestore).");
-    } catch (e) {
-      console.error(e);
-      alert("Error saving to cloud: " + e.message);
-    }
-  }
-
-  async function loadFromCloud() {
-    const user = auth.currentUser;
-    if (!user) {
-      alert("Login first.");
-      return;
-    }
-    try {
-      const snap = await db.collection("shops").doc(user.uid).get();
-      if (!snap.exists) {
-        alert("No cloud data found.");
-        return;
-      }
-      const data = snap.data();
-      const arr = Array.isArray(data.records) ? data.records : [];
-
-      // Convert array of objects -> 2D array
-      records = arr.map(o => ([
-        o.brand,
-        o.ml,
-        o.ob,
-        o.cb,
-        o.sales,
-        o.price,
-        o.sv,
-        o.cbv
-      ]));
-
-      saveData();
+    function printReport() {
       renderGroupedTables();
-      alert("Tables loaded from cloud.");
-    } catch (e) {
-      console.error(e);
-      alert("Error loading from cloud: " + e.message);
+      window.print();
     }
-  }
+    window.printReport = printReport;
 
-  document.getElementById("saveCloudBtn").addEventListener("click", saveToCloud);
-  document.getElementById("loadCloudBtn").addEventListener("click", loadFromCloud);
+    // ---------------- PRICE CHART ----------------
+    const PRICELIST = [
+      { brand: "Old king xxxx rum", ml: 180, price: 140 },
+      { brand: "Old king xxxx rum", ml: 375, price: 280 },
+      { brand: "Old king xxxx rum", ml: 750, price: 560 },
+      { brand: "Mens club dlx bdy", ml: 180, price:140 },
+      { brand: "Mens club dlx bdy", ml: 375, price:280 },
+      { brand: "Mens club dlx bdy", ml: 750, price:560 },
+      { brand: "Binneys dlx bdy", ml: 180, price:140 },
+      { brand: "Binneys dlx bdy", ml: 375, price:280 },
+      { brand: "Binneys dlx bdy", ml: 750, price:560 },
+      { brand: "Diamond bdy", ml: 180, price:140 },
+      { brand: "Diamond bdy", ml: 375, price:280 },
+      { brand: "Diamond bdy", ml: 750, price:560 },
+      { brand: "Diamond why", ml: 180, price:140 },
+      { brand: "Diamond why", ml: 375, price:280 },
+      { brand: "Diamond why", ml: 750, price:560 },
+      { brand: "Diamond xxx rum", ml: 180, price:140 },
+      { brand: "Diamond xxx rum", ml: 375, price:280 },
+      { brand: "Diamond xxx rum", ml: 750, price:560 },
+      { brand: "Mclene bdy", ml: 180, price:140 },
+      { brand: "Mclene bdy", ml: 375, price:280 },
+      { brand: "Mclene bdy", ml: 750, price:560 },
+      { brand: "Old secret xxx rum", ml: 180, price:140 },
+      { brand: "Old secret xxx rum", ml: 375, price:280 },
+      { brand: "Old secret xxx rum", ml: 750, price:560 },
+      { brand: "OLd chef dlx bdy", ml: 180, price:140 },
+      { brand: "OLd chef dlx bdy", ml: 375, price:280 },
+      { brand: "OLd chef dlx bdy", ml: 750, price:560 },
+      { brand: "Imp express spl bdy", ml: 180, price:140 },
+      { brand: "Imp express spl bdy", ml: 375, price:280 },
+      { brand: "Imp express spl bdy", ml: 750, price:560 },
+      { brand: "Imp express spl rum", ml: 180, price:140 },
+      { brand: "Imp express spl rum", ml: 375, price:280 },
+      { brand: "Imp express spl rum", ml: 750, price:560 },
+      { brand: "Golden eagle dr ord bdy", ml: 180, price:140 },
+      { brand: "Golden eagle dr ord bdy", ml: 375, price:280 },
+      { brand: "Golden eagle dr ord bdy", ml: 750, price:560 },
+      { brand: "Old monk dlx rum", ml: 180, price:140 },
+      { brand: "Old monk dlx rum", ml: 375, price:280 },
+      { brand: "Old monk dlx rum", ml: 750, price:560 },
+      { brand: "Vorion no.1 ind bdy", ml: 180, price:140 },
+      { brand: "Vorion no.1 ind bdy", ml: 375, price:280 },
+      { brand: "Vorion no.1 ind bdy", ml: 750, price:560 },
+      { brand: "Vorion no.1 ind xxx rum", ml: 180, price:140 },
+      { brand: "Vorion no.1 ind xxx rum", ml: 375, price:280 },
+      { brand: "Vorion no.1 ind xxx rum", ml: 750, price:560 },
+      { brand: "Monitor ord 3D gold rum", ml: 180, price:140 },
+      { brand: "Monitor ord 3D gold rum", ml: 375, price:280 },
+      { brand: "Monitor ord 3D gold rum", ml: 750, price:560 },
+      { brand: "Monitor dlx bdy", ml: 180, price:140 },
+      { brand: "Monitor dlx bdy", ml: 375, price:280 },
+      { brand: "Monitor dlx bdy", ml: 750, price:560 },
+      { brand: "Monitor dlx why", ml: 180, price:140 },
+      { brand: "Monitor dlx why", ml: 375, price:280 },
+      { brand: "Monitor dlx why", ml: 750, price:560 },
+      { brand: "Top star spl bdy", ml: 180, price:140 },
+      { brand: "Top star spl bdy", ml: 375, price:280 },
+      { brand: "Top star spl bdy", ml: 750, price:560 },
+      { brand: "Old chef str xxx rum", ml: 180, price:140 },
+      { brand: "Old chef str xxx rum", ml: 375, price:280 },
+      { brand: "Old chef str xxx rum", ml: 750, price:560 },
+      { brand: "top star spl why", ml: 180, price:140 },
+      { brand: "top star spl why", ml: 375, price:280 },
+      { brand: "top star spl why", ml: 750, price:560 },
+      { brand: "Top star str xxx rum ", ml: 180, price:140 },
+      { brand: "Top star str xxx rum", ml: 375, price:280 },
+      { brand: "Top star str xxx rum", ml: 750, price:560 },
+      { brand: "Honey day bdy", ml: 180, price:140 },
+      { brand: "Honey day bdy", ml: 375, price:280 },
+      { brand: "Honey day bdy", ml: 750, price:560 },
+      { brand: "Old monster xxx rum", ml: 180, price:140 },
+      { brand: "Old monster xxx rum", ml: 375, price:280 },
+      { brand: "Old monster xxx rum", ml: 750, price:560 },
+      { brand: "Arabian pride dlx xxx rum", ml: 180, price:140 },
+      { brand: "Arabian pride dlx xxx rum", ml: 375, price:280 },
+      { brand: "Arabian pride dlx xxx rum", ml: 750, price:560 },
+      { brand: "Honey day sup fin why", ml: 180, price:140 },
+      { brand: "Honey day sup fin why", ml: 375, price:280 },
+      { brand: "Honey day sup fin why", ml: 750, price:560 },
+      { brand: "golden choice dlx bdy", ml: 180, price:140 },
+      { brand: "golden choice dlx bdy", ml: 375, price:280 },
+      { brand: "golden choice dlx bdy", ml: 750, price:560 },
+      { brand: "Seamens pride cl bdy", ml: 180, price:140 },
+      { brand: "Seamens pride cl bdy", ml: 375, price:280 },
+      { brand: "Seamens pride cl bdy", ml: 750, price:560 },
+      { brand: "Oneman army xxx rum", ml: 180, price:140 },
+      { brand: "Oneman army xxx rum", ml: 375, price:280 },
+      { brand: "Oneman army xxx rum", ml: 750, price:560 },
+      { brand: "Black pearl bdy", ml: 180, price:140 },
+      { brand: "Black pearl bdy", ml: 375, price:280 },
+      { brand: "Black pearl bdy", ml: 750, price:560 },
+      { brand: "Black pearl xxx rum", ml: 180, price:140 },
+      { brand: "Black pearl xxx rum", ml: 375, price:280 },
+      { brand: "Black pearl xxx rum", ml: 750, price:560 },
+      { brand: "Red sea win", ml: 180, price:120 },
+      { brand: "Red sea win", ml: 375, price:240 },
+      { brand: "Red sea win", ml: 750, price:480 },
+      { brand: "Misty grapes win", ml: 180, price:130 },
+      { brand: "Misty grapes win", ml: 375, price:260 },
+      { brand: "Misty grapes win", ml: 750, price:520 },
+      { brand: "No.1 mc dowell medium why", ml: 180, price:170},
+      { brand: "No.1 mc dowell medium why", ml: 375, price:340},
+      { brand: "No.1 mc dowell medium why", ml: 750, price:680},
+      { brand: "No.1 mc dowell fine bdy", ml: 180, price:170},
+      { brand: "No.1 mc dowell fine bdy", ml: 375, price:340},
+      { brand: "No.1 mc dowell fine bdy", ml: 750, price:680},
+      { brand: "Honey bee fine bdy", ml: 180, price:170},
+      { brand: "Honey bee fine bdy", ml: 375, price:340},
+      { brand: "Honey bee fine bdy", ml: 750, price:680},
+      { brand: "Officers choice classic why", ml: 180, price:170},
+      { brand: "Officers choice classic why", ml: 375, price:340},
+      { brand: "Officers choice classic why", ml: 750, price:680},
+      { brand: "Officers choice no.1 classic bdy", ml: 180, price:170},
+      { brand: "Officers choice no.1 classic bdy", ml: 375, price:340},
+      { brand: "Officers choice no.1 classic bdy", ml: 750, price:680},
+      { brand: "mgm limon vodka", ml: 650, price:1000}
+      // add more if needed
+    ];
 
-  /* ---------------- PRICE CHART ---------------- */
-  const PRICELIST = [
-    { brand: "Old king xxxx rum", ml: 180, price: 140 },
-    { brand: "Old king xxxx rum", ml: 375, price: 280 },
-    { brand: "Old king xxxx rum", ml: 750, price: 560 },
-    { brand: "Mens club dlx bdy", ml: 180, price:140 },
-    { brand: "Mens club dlx bdy", ml: 375, price:280 },
-    { brand: "Mens club dlx bdy", ml: 750, price:560 },
-    { brand: "Binneys dlx bdy", ml: 180, price:140 },
-    { brand: "Binneys dlx bdy", ml: 375, price:280 },
-    { brand: "Binneys dlx bdy", ml: 750, price:560 },
-    { brand: "Diamond bdy", ml: 180, price:140 },
-    { brand: "Diamond bdy", ml: 375, price:280 },
-    { brand: "Diamond bdy", ml: 750, price:560 },
-    { brand: "Diamond why", ml: 180, price:140 },
-    { brand: "Diamond why", ml: 375, price:280 },
-    { brand: "Diamond why", ml: 750, price:560 },
-    { brand: "Diamond xxx rum", ml: 180, price:140 },
-    { brand: "Diamond xxx rum", ml: 375, price:280 },
-    { brand: "Diamond xxx rum", ml: 750, price:560 },
-    { brand: "Mclene bdy", ml: 180, price:140 },
-    { brand: "Mclene bdy", ml: 375, price:280 },
-    { brand: "Mclene bdy", ml: 750, price:560 },
-    { brand: "Old secret xxx rum", ml: 180, price:140 },
-    { brand: "Old secret xxx rum", ml: 375, price:280 },
-    { brand: "Old secret xxx rum", ml: 750, price:560 },
-    { brand: "OLd chef dlx bdy", ml: 180, price:140 },
-    { brand: "OLd chef dlx bdy", ml: 375, price:280 },
-    { brand: "OLd chef dlx bdy", ml: 750, price:560 },
-    /* continue with your full list here */
-  ];
+    const BRANDS = [...new Set(PRICELIST.map(x => x.brand))].sort();
 
-  function printReport() {
-    renderGroupedTables();
-    window.print();
-  }
+    // ---------------- DOM ELEMENTS ----------------
+    const form = document.getElementById("information");
+    const brandInput = document.getElementById("brand");
+    const mlSelect = document.getElementById("ml");
+    const priceInput = document.getElementById("price");
+    const datalist = document.getElementById("suggestions");
 
-  const BRANDS = [...new Set(PRICELIST.map(x => x.brand))].sort();
-  const STORAGEKEY = "calcrecords";
-  let records = [];
+    const editAllBtn = document.getElementById("editAllBtn");
+    const saveAllBtn = document.getElementById("saveAllBtn");
+    const storeCloudBtn = document.getElementById("storeCloudBtn");
+    const nextDayBtn = document.getElementById("nextDayBtn");
+    const listBtn = document.getElementById("listBtn");
 
-  function loadData() {
-    const saved = localStorage.getItem(STORAGEKEY);
-    if (saved) records = JSON.parse(saved);
-  }
-  function saveData() {
-    localStorage.setItem(STORAGEKEY, JSON.stringify(records));
-  }
+    const eraseBtn = document.getElementById("eraseBtn");
+    const eraseFormDiv = document.getElementById("eraseForm");
+    const eraseSubmit = document.getElementById("eraseSubmit");
 
-  const form = document.getElementById("information");
-  const brandInput = document.getElementById("brand");
-  const mlSelect = document.getElementById("ml");
-  const priceInput = document.getElementById("price");
-  const datalist = document.getElementById("suggestions");
+    brandInput.setAttribute("list", "suggestions");
 
-  if (brandInput) brandInput.setAttribute("list", "suggestions");
+    function renderBrandOptions(filterText) {
+      datalist.innerHTML = "";
+      const q = (filterText || "").toLowerCase();
 
-  function renderBrandOptions(filterText) {
-    if (!datalist) return;
-    datalist.innerHTML = "";
-    const q = (filterText || "").toLowerCase();
+      BRANDS
+        .filter(b => b.toLowerCase().includes(q))
+        .slice(0, 30)
+        .forEach(b => {
+          const opt = document.createElement("option");
+          opt.value = b;
+          datalist.appendChild(opt);
+        });
+    }
 
-    BRANDS
-      .filter(b => b.toLowerCase().includes(q))
-      .slice(0, 30)
-      .forEach(b => {
-        const opt = document.createElement("option");
-        opt.value = b;
-        datalist.appendChild(opt);
-      });
-  }
+    function autoApplyPrice() {
+      const brand = brandInput.value.trim();
+      const ml = parseFloat(mlSelect.value || 0);
+      if (!brand || !ml) return;
 
-  function autoApplyPrice() {
-    const brand = brandInput.value.trim();
-    const ml = parseFloat(mlSelect.value || 0);
-    if (!brand || !ml) return;
+      const match = PRICELIST.find(x => x.brand === brand && x.ml === ml);
+      if (match) priceInput.value = match.price;
+      else priceInput.value = "";
+    }
 
-    const match = PRICELIST.find(x => x.brand === brand && x.ml === ml);
-    if (match) priceInput.value = match.price;
-    else priceInput.value = "";
-  }
-
-  if (brandInput) {
     brandInput.addEventListener("input", () => {
       renderBrandOptions(brandInput.value);
       autoApplyPrice();
     });
     brandInput.addEventListener("focus", () => renderBrandOptions(brandInput.value));
-  }
-  if (mlSelect) {
     mlSelect.addEventListener("change", autoApplyPrice);
-  }
 
-  function money(n) { return (Number(n) || 0).toFixed(2); }
-  function sumField(arr, idx) { return arr.reduce((a, r) => a + (Number(r[idx]) || 0), 0); }
+    // ---------------- GROUPS ----------------
+    function money(n) { return (Number(n) || 0).toFixed(2); }
+    function sumField(arr, idx) { return arr.reduce((a, r) => a + (Number(r[idx]) || 0), 0); }
 
-  const GROUPS = [
-    { key: "180_140",   title: "Table 1: 180 ml (Price <= 140)",  filter: r => r[1] === 180 && r[5] <= 140 },
-    { key: "180_170",   title: "Table 2: 180 ml (Price = 170)",  filter: r => r[1] === 180 && r[5] === 170 },
-    { key: "180_gt200", title: "Table 3: 180 ml (Price >= 200)", filter: r => r[1] === 180 && r[5] >= 200 },
-    { key: "375",  title: "Table 4: 375 ml",  filter: r => r[1] === 375 },
-    { key: "750",  title: "Table 5: 750 ml",  filter: r => r[1] === 750 },
-    { key: "1000", title: "Table 6: 1000 ml", filter: r => r[1] === 1000 },
-    { key: "650",  title: "Table 7: 650 ml",  filter: r => r[1] === 650 },
-    { key: "500",  title: "Table 8: 500 ml",  filter: r => r[1] === 500 },
-  ];
+    const GROUPS = [
+      { key: "180_140",   title: "Table 1: 180 ml (Price <= 140)",  filter: r => r[1] === 180 && r[5] <= 140 },
+      { key: "180_170",   title: "Table 2: 180 ml (Price = 170)",  filter: r => r[1] === 180 && r[5] === 170 },
+      { key: "180_gt200", title: "Table 3: 180 ml (Price >= 200)",  filter: r => r[1] === 180 && r[5] >= 200 },
 
-  function renderGroupedTables() {
-    const host = document.getElementById("groups");
-    if (!host) return;
-    host.innerHTML = "";
+      { key: "375",  title: "Table 4: 375 ml",  filter: r => r[1] === 375 },
+      { key: "750",  title: "Table 5: 750 ml",  filter: r => r[1] === 750 },
+      { key: "1000", title: "Table 6: 1000 ml", filter: r => r[1] === 1000 },
+      { key: "650",  title: "Table 7: 650 ml",  filter: r => r[1] === 650 },
+      { key: "500",  title: "Table 8: 500 ml",  filter: r => r[1] === 500 },
+    ];
 
-    let t9OB = 0, t9CB = 0, t9Sales = 0, t9SV = 0, t9CBV = 0;
-    let t10OB = 0, t10CB = 0, t10Sales = 0, t10SV = 0, t10CBV = 0;
+    function renderGroupedTables() {
+      const host = document.getElementById("groups");
+      host.innerHTML = "";
 
-    GROUPS.forEach((g, idx) => {
-      const rows = records
-        .filter(g.filter)
-        .slice()
-        .sort((a, b) => Number(a[5]) - Number(b[5]));
+      let t9OB = 0, t9CB = 0, t9Sales = 0, t9SV = 0, t9CBV = 0;
+      let t10OB = 0, t10CB = 0, t10Sales = 0, t10SV = 0, t10CBV = 0;
 
-      const totalOB = sumField(rows, 2);
-      const totalCB = sumField(rows, 3);
-      const totalSales = sumField(rows, 4);
-      const totalSV = sumField(rows, 6);
-      const totalCBV = sumField(rows, 7);
+      GROUPS.forEach((g, idx) => {
+        const rows = records
+          .filter(g.filter)
+          .slice()
+          .sort((a, b) => Number(a[5]) - Number(b[5]));
 
-      if (idx >= 0 && idx <= 5) {
-        t9OB += totalOB; t9CB += totalCB; t9Sales += totalSales; t9SV += totalSV; t9CBV += totalCBV;
-      }
-      if (idx >= 6 && idx <= 7) {
-        t10OB += totalOB; t10CB += totalCB; t10Sales += totalSales; t10SV += totalSV; t10CBV += totalCBV;
-      }
+        const totalOB = sumField(rows, 2);
+        const totalCB = sumField(rows, 3);
+        const totalSales = sumField(rows, 4);
+        const totalSV = sumField(rows, 6);
+        const totalCBV = sumField(rows, 7);
 
-      const title = document.createElement("h2");
-      title.className = "groupTitle";
-      title.textContent = g.title;
-      host.appendChild(title);
+        if (idx >= 0 && idx <= 5) {
+          t9OB += totalOB; t9CB += totalCB; t9Sales += totalSales; t9SV += totalSV; t9CBV += totalCBV;
+        }
+        if (idx >= 6 && idx <= 7) {
+          t10OB += totalOB; t10CB += totalCB; t10Sales += totalSales; t10SV += totalSV; t10CBV += totalCBV;
+        }
 
-      const t = document.createElement("table");
-      t.innerHTML = `
-        <thead>
+        const title = document.createElement("h2");
+        title.className = "groupTitle";
+        title.textContent = g.title;
+        host.appendChild(title);
+
+        const t = document.createElement("table");
+        t.innerHTML = `
+          <thead>
+            <tr>
+              <th>S.No</th><th>Brand</th><th>ML</th><th>OB</th><th>CB</th>
+              <th>Sales</th><th>Price</th><th>Sales Value</th><th>CB Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${
+              rows.length === 0
+                ? `<tr><td colspan="9" style="text-align:center">No records</td></tr>`
+                : rows.map((r, i) => `
+                  <tr>
+                    <td>${i + 1}</td>
+                    <td>${r[0]}</td>
+                    <td>${r[1]}</td>
+                    <td>${r[2]}</td>
+                    <td>${r[3]}</td>
+                    <td>${r[4]}</td>
+                    <td>${r[5]}</td>
+                    <td>${money(r[6])}</td>
+                    <td>${money(r[7])}</td>
+                  </tr>
+                `).join("")
+            }
+          </tbody>
+        `;
+        host.appendChild(t);
+
+        const totals = document.createElement("table");
+        totals.className = "totalsTable";
+        totals.innerHTML = `
           <tr>
-            <th>S.No</th><th>Brand</th><th>ML</th><th>OB</th><th>CB</th>
-            <th>Sales</th><th>Price</th><th>Sales Value</th><th>CB Value</th>
+            <td>Total OB BOT: ${money(totalOB)}</td>
+            <td>Total CB BOT: ${money(totalCB)}</td>
+            <td>Total Sales BOT: ${money(totalSales)}</td>
+            <td>Total Sales Value: ${money(totalSV)}</td>
+            <td>Total CB Value: ${money(totalCBV)}</td>
           </tr>
-        </thead>
-        <tbody>
-          ${
-            rows.length === 0
-              ? `<tr><td colspan="9" style="text-align:center">No records</td></tr>`
-              : rows.map((r, i) => `
-                <tr>
-                  <td>${i + 1}</td>
-                  <td>${r[0]}</td>
-                  <td>${r[1]}</td>
-                  <td>${r[2]}</td>
-                  <td>${r[3]}</td>
-                  <td>${r[4]}</td>
-                  <td>${r[5]}</td>
-                  <td>${money(r[6])}</td>
-                  <td>${money(r[7])}</td>
-                </tr>
-              `).join("")
-          }
-        </tbody>
-      `;
-      host.appendChild(t);
+        `;
+        host.appendChild(totals);
+      });
 
-      const totals = document.createElement("table");
-      totals.className = "totalsTable";
-      totals.innerHTML = `
+      // Table 9 (IMSF)
+      const t9Title = document.createElement("h2");
+      t9Title.className = "groupTitle";
+      t9Title.textContent = "(IMSF)";
+      host.appendChild(t9Title);
+
+      const t9Totals = document.createElement("table");
+      t9Totals.className = "totalsTable";
+      t9Totals.innerHTML = `
+        <tr>
+          <td>Total OB BOT: ${money(t9OB)}</td>
+          <td>Total CB BOT: ${money(t9CB)}</td>
+          <td>Total Sales BOT: ${money(t9Sales)}</td>
+          <td>Total Sales Value: ${money(t9SV)}</td>
+          <td>Total CB Value: ${money(t9CBV)}</td>
+        </tr>
+      `;
+      host.appendChild(t9Totals);
+
+      // Table 10 (BEER)
+      const t10Title = document.createElement("h2");
+      t10Title.className = "groupTitle";
+      t10Title.textContent = "(BEER)";
+      host.appendChild(t10Title);
+
+      const t10Totals = document.createElement("table");
+      t10Totals.className = "totalsTable";
+      t10Totals.innerHTML = `
+        <tr>
+          <td>Total OB BOT: ${money(t10OB)}</td>
+          <td>Total CB BOT: ${money(t10CB)}</td>
+          <td>Total Sales BOT: ${money(t10Sales)}</td>
+          <td>Total Sales Value: ${money(t10SV)}</td>
+          <td>Total CB Value: ${money(t10CBV)}</td>
+        </tr>
+      `;
+      host.appendChild(t10Totals);
+
+      // Table 11: IMSF + BEER
+      const totalTitle = document.createElement("h2");
+      totalTitle.className = "groupTitle";
+      totalTitle.textContent = "Total(IMSF&BEER)";
+      host.appendChild(totalTitle);
+
+      const totalTable = document.createElement("table");
+      totalTable.className = "totalsTable";
+
+      const totalOB = t9OB + t10OB;
+      const totalCB = t9CB + t10CB;
+      const totalSales = t9Sales + t10Sales;
+      const totalSV = t9SV + t10SV;
+      const totalCBV = t9CBV + t10CBV;
+
+      totalTable.innerHTML = `
         <tr>
           <td>Total OB BOT: ${money(totalOB)}</td>
           <td>Total CB BOT: ${money(totalCB)}</td>
@@ -585,76 +562,12 @@ const firebaseConfig = {
           <td>Total CB Value: ${money(totalCBV)}</td>
         </tr>
       `;
-      host.appendChild(totals);
-    });
+      host.appendChild(totalTable);
+    }
 
-    const t9Title = document.createElement("h2");
-    t9Title.className = "groupTitle";
-    t9Title.textContent = "(IMSF)";
-    host.appendChild(t9Title);
+    // --------- EDIT ALL ---------
+    let currentEditGroupIndex = null;
 
-    const t9Totals = document.createElement("table");
-    t9Totals.className = "totalsTable";
-    t9Totals.innerHTML = `
-      <tr>
-        <td>Total OB BOT: ${money(t9OB)}</td>
-        <td>Total CB BOT: ${money(t9CB)}</td>
-        <td>Total Sales BOT: ${money(t9Sales)}</td>
-        <td>Total Sales Value: ${money(t9SV)}</td>
-        <td>Total CB Value: ${money(t9CBV)}</td>
-      </tr>
-    `;
-    host.appendChild(t9Totals);
-
-    const t10Title = document.createElement("h2");
-    t10Title.className = "groupTitle";
-    t10Title.textContent = "(BEER)";
-    host.appendChild(t10Title);
-
-    const t10Totals = document.createElement("table");
-    t10Totals.className = "totalsTable";
-    t10Totals.innerHTML = `
-      <tr>
-        <td>Total OB BOT: ${money(t10OB)}</td>
-        <td>Total CB BOT: ${money(t10CB)}</td>
-        <td>Total Sales BOT: ${money(t10Sales)}</td>
-        <td>Total Sales Value: ${money(t10SV)}</td>
-        <td>Total CB Value: ${money(t10CBV)}</td>
-      </tr>
-    `;
-    host.appendChild(t10Totals);
-
-    const totalTitle = document.createElement("h2");
-    totalTitle.className = "groupTitle";
-    totalTitle.textContent = "Total(IMSF&BEER)";
-    host.appendChild(totalTitle);
-
-    const totalTable = document.createElement("table");
-    totalTable.className = "totalsTable";
-
-    const totalOB = t9OB + t10OB;
-    const totalCB = t9CB + t10CB;
-    const totalSales = t9Sales + t10Sales;
-    const totalSV = t9SV + t10SV;
-    const totalCBV = t9CBV + t10CBV;
-
-    totalTable.innerHTML = `
-      <tr>
-        <td>Total OB BOT: ${money(totalOB)}</td>
-        <td>Total CB BOT: ${money(totalCB)}</td>
-        <td>Total Sales BOT: ${money(totalSales)}</td>
-        <td>Total Sales Value: ${money(totalSV)}</td>
-        <td>Total CB Value: ${money(totalCBV)}</td>
-      </tr>
-    `;
-    host.appendChild(totalTable);
-  }
-
-  const editAllBtn = document.getElementById("editAllBtn");
-  const saveAllBtn = document.getElementById("saveAllBtn");
-  let currentEditGroupIndex = null;
-
-  if (editAllBtn) {
     editAllBtn.addEventListener("click", function () {
       const tableNoStr = prompt("Enter Table Number (1-8) to Edit All OB & CB:");
       if (tableNoStr === null) return;
@@ -692,9 +605,7 @@ const firebaseConfig = {
       editAllBtn.style.display = "none";
       saveAllBtn.style.display = "inline-block";
     });
-  }
 
-  if (saveAllBtn) {
     saveAllBtn.addEventListener("click", function () {
       if (currentEditGroupIndex === null) return;
 
@@ -735,16 +646,13 @@ const firebaseConfig = {
         rec[7] = rec[5] * rec[3];
       }
 
-      saveData();
       renderGroupedTables();
-
       currentEditGroupIndex = null;
       saveAllBtn.style.display = "none";
       editAllBtn.style.display = "inline-block";
     });
-  }
 
-  if (form) {
+    // ---------------- SUBMIT (ADD / EDIT) ----------------
     form.addEventListener("submit", function(e) {
       e.preventDefault();
 
@@ -770,13 +678,13 @@ const firebaseConfig = {
         return;
       }
 
-      const editIndexStr = localStorage.getItem("editIndex");
+      const editIndexStr = window.localStorage.getItem("editIndex");
       const isEditing = editIndexStr !== null;
       const editIndex = isEditing ? parseInt(editIndexStr, 10) : -1;
 
       if (isEditing) {
         records[editIndex] = newRecord;
-        localStorage.removeItem("editIndex");
+        window.localStorage.removeItem("editIndex");
         alert("Row updated successfully.");
       } else {
         const duplicateInSameTable = records.some(r =>
@@ -791,26 +699,18 @@ const firebaseConfig = {
         records.push(newRecord);
       }
 
-      saveData();
       renderGroupedTables();
 
       form.reset();
       brandInput.setAttribute("list", "suggestions");
       datalist.innerHTML = "";
     });
-  }
 
-  const eraseBtn = document.getElementById("eraseBtn");
-  const eraseForm = document.getElementById("eraseForm");
-  const eraseSubmit = document.getElementById("eraseSubmit");
-
-  if (eraseBtn) {
+    // -------- ERASE Nth ROW --------
     eraseBtn.addEventListener("click", () => {
-      eraseForm.style.display = eraseForm.style.display === "none" ? "block" : "none";
+      eraseFormDiv.style.display = eraseFormDiv.style.display === "none" ? "block" : "none";
     });
-  }
 
-  if (eraseSubmit) {
     eraseSubmit.addEventListener("click", () => {
       const tno = parseInt(document.getElementById("eraseTableNo").value, 10);
       const rno = parseInt(document.getElementById("eraseRowNo").value, 10);
@@ -842,17 +742,14 @@ const firebaseConfig = {
 
       const removeIndex = tableRows[rno - 1].idx;
       records.splice(removeIndex, 1);
-      saveData();
       renderGroupedTables();
 
       document.getElementById("eraseTableNo").value = "";
       document.getElementById("eraseRowNo").value = "";
     });
-  }
 
-  const singleEditBtn = document.getElementById("muhil");
-  if (singleEditBtn) {
-    singleEditBtn.addEventListener("click", function () {
+    // ---------------- EDIT ROW (by table + row) ----------------
+    document.getElementById("muhil").addEventListener("click", function () {
       const tableNoStr = prompt("Enter Table Number to edit:");
       if (tableNoStr === null) return;
 
@@ -894,33 +791,153 @@ const firebaseConfig = {
       document.getElementById("cb").value = row[3];
       priceInput.value = row[5];
 
-      localStorage.setItem("editIndex", globalIndex);
-
+      window.localStorage.setItem("editIndex", globalIndex);
       alert("Row loaded. Edit values and press Submit to save.");
     });
-  }
 
-  function clearAll() {
-    const ok = confirm("Do you want to clear all records?");
-    if (!ok) return;
+    // ---------------- CLEAR ALL ----------------
+    function clearAll() {
+      const ok = confirm("Do you want to clear all records?");
+      if (!ok) return;
 
-    const text = prompt('Type "yes" to clear all records:');
-    if (text === null) return;
+      const text = prompt('Type "yes" to clear all records:');
+      if (text === null) return;
 
-    if (text.toLowerCase() !== "yes") {
-      alert("Clear cancelled.");
-      return;
+      if (text.toLowerCase() !== "yes") {
+        alert("Clear cancelled.");
+        return;
+      }
+
+      records = [];
+      currentListId = null;
+      renderGroupedTables();
+    }
+    window.clearAll = clearAll;
+
+    // ---------------- NEXT DAY (OB = old CB, CB = old CB) ----------------
+    function nextDayTransform() {
+      records = records.map(r => {
+        const brand = r[0];
+        const ml    = r[1];
+        const oldCB = Number(r[3]) || 0;  // yesterday CB
+        const price = Number(r[5]) || 0;
+
+        const newOB = oldCB;  // OB = old CB
+        const newCB = oldCB;  // CB = old CB
+        const sales = newOB - newCB; // 0
+        const sv    = price * sales; // 0
+        const cbv   = price * newCB;
+
+        return [brand, ml, newOB, newCB, sales, price, sv, cbv];
+      });
+
+      currentListId = null;  // new day not stored yet
+      renderGroupedTables();
     }
 
-    records = [];
-    localStorage.removeItem(STORAGEKEY);
-    renderGroupedTables();
-  }
-  window.clearAll = clearAll;
+    nextDayBtn.addEventListener("click", () => {
+      if (!confirm("Go to next day? OB = CB, CB stays same, sales reset to 0.")) return;
+      nextDayTransform();
+    });
 
-  loadData();
-  renderBrandOptions("");
-  renderGroupedTables();
+    // ---------------- STORE TO CLOUD (manual) ----------------
+    async function storeToCloud() {
+      if (!currentUser) {
+        alert("Please sign in with Google first.");
+        return;
+      }
+      if (!records || records.length === 0) {
+        if (!confirm("No records. Store empty list?")) return;
+      }
+
+      const payload = {
+        uid: currentUser.uid,
+        createdAt: Date.now(),
+        records: records
+      };
+
+      if (currentListId) {
+        await setDoc(doc(db, "lists", currentListId), payload);
+      } else {
+        const ref = await addDoc(collection(db, "lists"), payload);
+        currentListId = ref.id;
+      }
+
+      alert("Data stored to cloud.");
+    }
+
+    storeCloudBtn.addEventListener("click", () => {
+      storeToCloud().catch(err => {
+        console.error(err);
+        alert("Error storing to cloud.");
+      });
+    });
+
+    // ---------------- CLOUD LISTS (load) ----------------
+    async function showCloudLists() {
+      if (!currentUser) {
+        alert("Please sign in with Google first.");
+        return;
+      }
+
+      const q = query(collection(db, "lists"), where("uid", "==", currentUser.uid));
+      const snap = await getDocs(q);
+
+      const docsArr = [];
+      snap.forEach(docSnap => {
+        const data = docSnap.data();
+        docsArr.push({
+          id: docSnap.id,
+          createdAt: data.createdAt || 0,
+          count: (data.records || []).length
+        });
+      });
+
+      if (docsArr.length === 0) {
+        alert("No cloud lists found.");
+        return;
+      }
+
+      docsArr.sort((a, b) => a.createdAt - b.createdAt);
+
+      let msg = "Your cloud lists:\n";
+      docsArr.forEach((d, i) => {
+        const date = new Date(d.createdAt).toLocaleString();
+        msg += `${i + 1}) ${date} – ${d.count} rows\n`;
+      });
+      msg += "\nEnter number to load:";
+
+      const choiceStr = prompt(msg);
+      if (choiceStr === null) return;
+      const idx = parseInt(choiceStr, 10) - 1;
+      if (isNaN(idx) || idx < 0 || idx >= docsArr.length) {
+        alert("Invalid choice.");
+        return;
+      }
+
+      const chosen = docsArr[idx];
+      const docSnap = await getDoc(doc(db, "lists", chosen.id));
+      if (!docSnap.exists()) {
+        alert("List not found.");
+        return;
+      }
+
+      const data = docSnap.data();
+      records = data.records || [];
+      currentListId = chosen.id;
+      renderGroupedTables();
+    }
+
+    listBtn.addEventListener("click", () => {
+      showCloudLists().catch(err => {
+        console.error(err);
+        alert("Error loading cloud lists.");
+      });
+    });
+
+    // ---------------- Initial load ----------------
+    renderBrandOptions("");
+    renderGroupedTables();
   </script>
 </body>
 </html>
