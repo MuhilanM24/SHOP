@@ -2,10 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Ⓜ️GROUPS – SHOP NO:2605</title>
+  <title>Ⓜ️GROUPS CLOUD</title>
   <style>
-    body { background: aquamarine; font-family: Arial, sans-serif; }
+    body { background: aquamarine; font-family: Arial, sans-serif; padding-bottom: 50px; }
     h1 { text-align: center; margin-top: 10px; }
+
+    /* Auth Bar */
+    .auth-bar { background: #333; color: white; padding: 10px; text-align: center; margin-bottom: 10px; border-radius: 5px; }
+    .auth-bar button { margin-left: 10px; padding: 5px 10px; cursor: pointer; }
+
     form {
       background: rgb(191, 183, 187);
       text-align: center;
@@ -14,62 +19,49 @@
       width: fit-content;
       border-radius: 10px;
     }
-    table {
-      background: antiquewhite;
-      margin: 12px auto;
-      border-collapse: collapse;
-      width: 95%;
-      max-width: 1100px;
-    }
+    table { background: antiquewhite; margin: 12px auto; border-collapse: collapse; width: 95%; max-width: 1100px; }
     th, td { border: 1px solid #333; padding: 6px 10px; }
     th { background: #f1e2c6; }
     .groupTitle { text-align: center; margin: 18px 0 6px; }
-    .totalsTable {
-      width: 95%;
-      max-width: 1100px;
-      margin: 0 auto 18px;
-      background: yellow;
-      font-weight: bold;
-    }
+    .totalsTable { width: 95%; max-width: 1100px; margin: 0 auto 18px; background: yellow; font-weight: bold; }
+
+    .btn-blue { background: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; margin: 5px; }
+    .btn-orange { background: #fd7e14; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; margin: 5px; }
+    .btn-purple { background: #6f42c1; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; margin: 5px; }
+
     #qwe { background: red; color: #fff; padding: 8px 14px; border: 0; cursor: pointer; }
     #muhil { background: green; color: #fff; padding: 8px 14px; border: 0; cursor: pointer; }
+
     input, select { padding: 6px; }
-    .editing { background: #ffeeba; }
-    #userInfo {
-      margin: 5px 10px;
-      text-align: right;
-      font-weight: bold;
+
+    /* Modal for Cloud List */
+    #listModal {
+      display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.7);
     }
+    .modal-content {
+      background-color: white; margin: 10% auto; padding: 20px; border-radius: 10px; width: 80%; max-width: 600px;
+    }
+
     @media print {
-      form,
-      #printBtn,
-      #muhil,
-      #qwe,
-      .muhil,
-      .qwe,
-      #eraseBox,
-      #eraseForm,
-      #eraseBtn,
-      #eraseSubmit,
-      #storeCloudBtn,
-      #nextDayBtn,
-      #listBtn,
-      #userInfo {
-        display: none !important;
-      }
+      form, .auth-bar, #listModal, #eraseBox, button { display: none !important; }
       body { background: white !important; }
-      table { width: 100% !important; max-width: 100% !important; }
-      .totalsTable { page-break-inside: avoid; }
-      h2 { page-break-after: avoid; }
     }
   </style>
 </head>
 
 <body>
+
+  <!-- GOOGLE LOGIN (Firebase Auth) -->
+  <div class="auth-bar">
+    <span id="userStatus">Not Logged In</span>
+    <button id="loginBtn">Google Login</button>
+    <button id="logoutBtn" style="display:none;">Logout</button>
+  </div>
+
   <h1>SHOP NO:2605</h1>
 
-  <div id="userInfo">Checking login...</div>
-
+  <!-- MAIN FORM -->
   <form id="information">
     <label for="brand">Brand name</label>
     <input type="text" id="brand" placeholder="Type brand name..." autocomplete="off" />
@@ -90,161 +82,119 @@
     </select>
 
     <br><br>
-
-    <label for="ob">Enter opening balance</label>
-    <input type="number" id="ob" name="ob" placeholder="Enter the number" />
+    <label for="ob">Opening</label> <input type="number" id="ob" />
+    <label for="cb">Closing</label> <input type="number" id="cb" />
+    <br><br>
+    <label for="price">Price</label> <input type="number" id="price" />
 
     <br><br>
+    <input type="submit" value="Submit Row" class="btn-blue" />
+    <input type="reset" value="Clear Form" />
 
-    <label for="cb">Enter closing balance</label>
-    <input type="number" id="cb" name="cb" placeholder="Enter the number" />
+    <hr>
+    <h3>Cloud & Tools</h3>
+    <!-- NEXT DAY: OB = old CB, CB = 0 -->
+    <button type="button" class="btn-orange" id="nextDayBtn">☀️ NEXT DAY (CB → OB)</button>
+    <!-- STORE TO CLOUD: save all records for this user -->
+    <button type="button" class="btn-blue" id="storeCloudBtn">☁️ STORE TO CLOUD</button>
+    <!-- LIST BUTTON: show all stored reports and load one -->
+    <button type="button" class="btn-purple" id="listBtn">📂 LIST BUTTON</button>
 
-    <br><br>
-
-    <label for="price">price</label>
-    <input type="number" id="price" name="price" placeholder="price" />
-
-    <br><br>
-
-    <input type="reset" value="clear" />
-    <input type="submit" value="submit" />
-
-    <br><br><hr><hr>
-
-    <button type="button" id="muhil">EDIT</button>
-
-    <br><br><hr>
+    <hr>
+    <button type="button" id="muhil">EDIT ROW</button>
     <button type="button" id="editAllBtn">Edit All</button>
-    <button type="button" id="saveAllBtn" style="display:none;">Save</button>
-
-    <br><br><hr>
-    <button type="button" id="storeCloudBtn">Store to Cloud</button>
-    <button type="button" id="nextDayBtn">Next Day</button>
-    <button type="button" id="listBtn">Cloud Lists</button>
-
-    <br><br><hr>
-    <button type="button" id="qwe" onclick="clearAll()">Clear table</button>
-    <br><br><hr>
-    <button type="button" id="printBtn" onclick="printReport()">Print / Save PDF</button>
+    <button type="button" id="saveAllBtn" style="display:none;">Save All</button>
+    <button type="button" id="qwe" onclick="clearAll()">Clear Table</button>
+    <button type="button" id="printBtn" onclick="window.print()">Print PDF</button>
   </form>
 
   <div id="groups"></div>
 
-  <div id="eraseBox" style="width:95%;max-width:1100px;margin:10px auto;text-align:center;">
-    <button type="button" id="eraseBtn" class="qwe">Erase Row</button>
-    <div id="eraseForm" style="display:none;margin-top:10px;">
-      <input type="number" id="eraseTableNo" min="1" max="8" placeholder="Table no (1-8)">
-      <input type="number" id="eraseRowNo" min="1" placeholder="Row no (N)">
-      <button type="button" id="eraseSubmit" class="muhil">Submit</button>
+  <!-- Cloud list modal -->
+  <div id="listModal">
+    <div class="modal-content">
+      <h2>Cloud Saved Records</h2>
+      <div id="cloudDataList">Loading...</div>
+      <br>
+      <button onclick="document.getElementById('listModal').style.display='none'">Close</button>
     </div>
   </div>
 
-  <script type="module">
-    import {
-      initializeApp
-    } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import {
-      getFirestore,
-      collection,
-      addDoc,
-      getDocs,
-      getDoc,
-      doc,
-      setDoc,
-      query,
-      where
-    } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+  <!-- Firebase compat SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-    // ---------- Parse JWT from query (from login.html) ----------
-    function decodeJWT(token) {
-      const base64Url = token.split(".")[1];
-      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split("")
-          .map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-          .join("")
-      );
-      return JSON.parse(jsonPayload);
-    }
-
-    function getCredentialFromQuery() {
-      const params = new URLSearchParams(window.location.search);
-      const cred = params.get("cred");
-      return cred ? decodeURIComponent(cred) : null;
-    }
-
-    let currentUser = null;
-    let records = [];
-    let currentListId = null;
-
-    (function initLogin() {
-      const cred = getCredentialFromQuery();
-      const ui = document.getElementById("userInfo");
-      if (!cred) {
-        ui.textContent = "Not signed in – go to login.html";
-        return;
-      }
-      try {
-        const payload = decodeJWT(cred);
-        currentUser = {
-          uid: payload.sub,
-          name: payload.name,
-          email: payload.email
-        };
-        ui.textContent =
-          "Signed in as: " + currentUser.name + " (" + currentUser.email + ")";
-      } catch (e) {
-        console.error(e);
-        ui.textContent = "Login info invalid – please login again.";
-      }
-    })();
-
-    function printReport() {
-      renderGroupedTables();
-      window.print();
-    }
-    window.printReport = printReport;
-
-    // ---------- Firebase config ----------
-      const firebaseConfig = {
-  apiKey: "AIzaSyBqtTwZJfNYF48MK-R4uF60FkuEuGKCEJY",
-  authDomain: "shop-987b6.firebaseapp.com",
-  projectId: "shop-987b6",
-  storageBucket: "shop-987b6.firebasestorage.app",
-  messagingSenderId: "1022735148857",
-  appId: "1:1022735148857:web:5d6f667191abf18f1eeae8",
-  measurementId: "G-NPHYKZ1VM5"
+  <script>
+    // --- STEP 1: CONFIGURATION (FILL THESE) ---  [web:126]
+const firebaseConfig = {
+  apiKey: "AIzaSyCYBSq_NTLy0lqcL1bXd3iGtjr16fZEvBA",
+  authDomain: "store-45bb2.firebaseapp.com",
+  projectId: "store-45bb2",
+  storageBucket: "store-45bb2.firebasestorage.app",
+  messagingSenderId: "385087942859",
+  appId: "1:385087942859:web:47de5f5375550a26bb6b4e",
+  measurementId: "G-V7PY6W7VND"
 };
 
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const provider = new firebase.auth.GoogleAuthProvider();
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    let currentUser = null;
+    let records = JSON.parse(localStorage.getItem("calcrecords")) || [];
 
-    // ---------- PRICE LIST, DOM, GROUPS ----------
-    // (same as before – shortened here for space, keep your full PRICELIST)
+    // --- STEP 2: AUTH LOGIC (Google login) ---  [web:69][web:123]
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        currentUser = user;
+        document.getElementById("userStatus").innerText = "User: " + user.email;
+        document.getElementById("loginBtn").style.display = "none";
+        document.getElementById("logoutBtn").style.display = "inline";
+      } else {
+        currentUser = null;
+        document.getElementById("userStatus").innerText = "Not Logged In";
+        document.getElementById("loginBtn").style.display = "inline";
+        document.getElementById("logoutBtn").style.display = "none";
+      }
+    });
 
-    const PRICELIST = [ /* ... full list from previous code ... */ ];
+    document.getElementById("loginBtn").onclick  = () => auth.signInWithPopup(provider);
+    document.getElementById("logoutBtn").onclick = () => auth.signOut();
+
+    // ---------- PRICE LIST (short; add full list as you need) ----------
+    const PRICELIST = [
+      { brand: "Old king xxxx rum", ml: 180, price: 140 },
+      { brand: "Old king xxxx rum", ml: 375, price: 280 },
+      { brand: "Old king xxxx rum", ml: 750, price: 560 },
+      // add your full list here...
+    ];
 
     const BRANDS = [...new Set(PRICELIST.map(x => x.brand))].sort();
 
-    const form = document.getElementById("information");
-    const brandInput = document.getElementById("brand");
-    const mlSelect = document.getElementById("ml");
-    const priceInput = document.getElementById("price");
-    const datalist = document.getElementById("suggestions");
-    const editAllBtn = document.getElementById("editAllBtn");
-    const saveAllBtn = document.getElementById("saveAllBtn");
-    const storeCloudBtn = document.getElementById("storeCloudBtn");
-    const nextDayBtn = document.getElementById("nextDayBtn");
-    const listBtn = document.getElementById("listBtn");
-    const eraseBtn = document.getElementById("eraseBtn");
-    const eraseFormDiv = document.getElementById("eraseForm");
-    const eraseSubmit = document.getElementById("eraseSubmit");
+    // ---------- GROUPS ----------
+    const GROUPS = [
+      { key: "180_140", title: "Table 1: 180 ml (Price <= 140)", filter: r => r[1] === 180 && r[5] <= 140 },
+      { key: "180_170", title: "Table 2: 180 ml (Price = 170)", filter: r => r[1] === 180 && r[5] === 170 },
+      { key: "180_gt200", title: "Table 3: 180 ml (Price >= 200)", filter: r => r[1] === 180 && r[5] >= 200 },
+      { key: "375", title: "Table 4: 375 ml", filter: r => r[1] === 375 },
+      { key: "750", title: "Table 5: 750 ml", filter: r => r[1] === 750 },
+      { key: "1000", title: "Table 6: 1000 ml", filter: r => r[1] === 1000 },
+      { key: "650", title: "Table 7: 650 ml", filter: r => r[1] === 650 },
+      { key: "500", title: "Table 8: 500 ml", filter: r => r[1] === 500 },
+    ];
 
-    brandInput.setAttribute("list", "suggestions");
+    // ---------- Helpers ----------
+    function money(n) { return (Number(n) || 0).toFixed(2); }
+
+    function saveAndRender() {
+      localStorage.setItem("calcrecords", JSON.stringify(records));
+      renderGroupedTables();
+    }
 
     function renderBrandOptions(filterText) {
+      const datalist = document.getElementById("suggestions");
       datalist.innerHTML = "";
       const q = (filterText || "").toLowerCase();
       BRANDS
@@ -258,34 +208,14 @@
     }
 
     function autoApplyPrice() {
-      const brand = brandInput.value.trim();
-      const ml = parseFloat(mlSelect.value || 0);
+      const brand = document.getElementById("brand").value.trim();
+      const ml = Number(document.getElementById("ml").value || 0);
       if (!brand || !ml) return;
       const match = PRICELIST.find(x => x.brand === brand && x.ml === ml);
-      priceInput.value = match ? match.price : "";
+      document.getElementById("price").value = match ? match.price : "";
     }
 
-    brandInput.addEventListener("input", () => {
-      renderBrandOptions(brandInput.value);
-      autoApplyPrice();
-    });
-    brandInput.addEventListener("focus", () => renderBrandOptions(brandInput.value));
-    mlSelect.addEventListener("change", autoApplyPrice);
-
-    function money(n) { return (Number(n) || 0).toFixed(2); }
-    function sumField(arr, idx) { return arr.reduce((a, r) => a + (Number(r[idx]) || 0), 0); }
-
-    const GROUPS = [
-      { key: "180_140",   title: "Table 1: 180 ml (Price <= 140)",  filter: r => r[1] === 180 && r[5] <= 140 },
-      { key: "180_170",   title: "Table 2: 180 ml (Price = 170)",  filter: r => r[1] === 180 && r[5] === 170 },
-      { key: "180_gt200", title: "Table 3: 180 ml (Price >= 200)",  filter: r => r[1] === 180 && r[5] >= 200 },
-      { key: "375",  title: "Table 4: 375 ml",  filter: r => r[1] === 375 },
-      { key: "750",  title: "Table 5: 750 ml",  filter: r => r[1] === 750 },
-      { key: "1000", title: "Table 6: 1000 ml", filter: r => r[1] === 1000 },
-      { key: "650",  title: "Table 7: 650 ml",  filter: r => r[1] === 650 },
-      { key: "500",  title: "Table 8: 500 ml",  filter: r => r[1] === 500 },
-    ];
-
+    // ---------- Render tables ----------
     function renderGroupedTables() {
       const host = document.getElementById("groups");
       host.innerHTML = "";
@@ -294,58 +224,49 @@
       let t10OB = 0, t10CB = 0, t10Sales = 0, t10SV = 0, t10CBV = 0;
 
       GROUPS.forEach((g, idx) => {
-        const rows = records
-          .filter(g.filter)
-          .slice()
-          .sort((a, b) => Number(a[5]) - Number(b[5]));
+        const rows = records.filter(g.filter).slice().sort((a, b) => a[5] - b[5]);
 
-        const totalOB = sumField(rows, 2);
-        const totalCB = sumField(rows, 3);
-        const totalSales = sumField(rows, 4);
-        const totalSV = sumField(rows, 6);
-        const totalCBV = sumField(rows, 7);
+        const totalOB  = rows.reduce((a,r) => a + (r[2] || 0), 0);
+        const totalCB  = rows.reduce((a,r) => a + (r[3] || 0), 0);
+        const totalS   = rows.reduce((a,r) => a + (r[4] || 0), 0);
+        const totalSV  = rows.reduce((a,r) => a + (r[6] || 0), 0);
+        const totalCBV = rows.reduce((a,r) => a + (r[7] || 0), 0);
 
-        if (idx >= 0 && idx <= 5) {
-          t9OB += totalOB; t9CB += totalCB; t9Sales += totalSales; t9SV += totalSV; t9CBV += totalCBV;
-        }
-        if (idx >= 6 && idx <= 7) {
-          t10OB += totalOB; t10CB += totalCB; t10Sales += totalSales; t10SV += totalSV; t10CBV += totalCBV;
+        if (idx <= 5) {
+          t9OB  += totalOB;  t9CB  += totalCB;  t9Sales += totalS;  t9SV += totalSV;  t9CBV += totalCBV;
+        } else {
+          t10OB += totalOB; t10CB += totalCB; t10Sales += totalS; t10SV += totalSV; t10CBV += totalCBV;
         }
 
-        const title = document.createElement("h2");
-        title.className = "groupTitle";
-        title.textContent = g.title;
-        host.appendChild(title);
+        const h2 = document.createElement("h2");
+        h2.className = "groupTitle";
+        h2.innerText = g.title;
+        host.appendChild(h2);
 
-        const t = document.createElement("table");
-        t.innerHTML = `
-          <thead>
-            <tr>
-              <th>S.No</th><th>Brand</th><th>ML</th><th>OB</th><th>CB</th>
-              <th>Sales</th><th>Price</th><th>Sales Value</th><th>CB Value</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${
-              rows.length === 0
-                ? `<tr><td colspan="9" style="text-align:center">No records</td></tr>`
-                : rows.map((r, i) => `
-                  <tr>
-                    <td>${i + 1}</td>
-                    <td>${r[0]}</td>
-                    <td>${r[1]}</td>
-                    <td>${r[2]}</td>
-                    <td>${r[3]}</td>
-                    <td>${r[4]}</td>
-                    <td>${r[5]}</td>
-                    <td>${money(r[6])}</td>
-                    <td>${money(r[7])}</td>
-                  </tr>
-                `).join("")
-            }
-          </tbody>
-        `;
-        host.appendChild(t);
+        let html = `<table><thead><tr>
+          <th>S.No</th><th>Brand</th><th>ML</th><th>OB</th><th>CB</th>
+          <th>Sales</th><th>Price</th><th>Sales Value</th><th>CB Value</th>
+        </tr></thead><tbody>`;
+
+        if (rows.length === 0) {
+          html += `<tr><td colspan="9" style="text-align:center">No Data</td></tr>`;
+        } else {
+          rows.forEach((r,i) => {
+            html += `<tr>
+              <td>${i+1}</td>
+              <td>${r[0]}</td>
+              <td>${r[1]}</td>
+              <td>${r[2]}</td>
+              <td>${r[3]}</td>
+              <td>${r[4]}</td>
+              <td>${r[5]}</td>
+              <td>${money(r[6])}</td>
+              <td>${money(r[7])}</td>
+            </tr>`;
+          });
+        }
+        html += `</tbody></table>`;
+        host.insertAdjacentHTML("beforeend", html);
 
         const totals = document.createElement("table");
         totals.className = "totalsTable";
@@ -353,90 +274,68 @@
           <tr>
             <td>Total OB BOT: ${money(totalOB)}</td>
             <td>Total CB BOT: ${money(totalCB)}</td>
-            <td>Total Sales BOT: ${money(totalSales)}</td>
+            <td>Total Sales BOT: ${money(totalS)}</td>
             <td>Total Sales Value: ${money(totalSV)}</td>
             <td>Total CB Value: ${money(totalCBV)}</td>
-          </tr>
-        `;
+          </tr>`;
         host.appendChild(totals);
       });
 
-      const t9Title = document.createElement("h2");
-      t9Title.className = "groupTitle";
-      t9Title.textContent = "(IMSF)";
-      host.appendChild(t9Title);
-
-      const t9Totals = document.createElement("table");
-      t9Totals.className = "totalsTable";
-      t9Totals.innerHTML = `
-        <tr>
-          <td>Total OB BOT: ${money(t9OB)}</td>
-          <td>Total CB BOT: ${money(t9CB)}</td>
-          <td>Total Sales BOT: ${money(t9Sales)}</td>
-          <td>Total Sales Value: ${money(t9SV)}</td>
-          <td>Total CB Value: ${money(t9CBV)}</td>
-        </tr>
-      `;
-      host.appendChild(t9Totals);
-
-      const t10Title = document.createElement("h2");
-      t10Title.className = "groupTitle";
-      t10Title.textContent = "(BEER)";
-      host.appendChild(t10Title);
-
-      const t10Totals = document.createElement("table");
-      t10Totals.className = "totalsTable";
-      t10Totals.innerHTML = `
-        <tr>
-          <td>Total OB BOT: ${money(t10OB)}</td>
-          <td>Total CB BOT: ${money(t10CB)}</td>
-          <td>Total Sales BOT: ${money(t10Sales)}</td>
-          <td>Total Sales Value: ${money(t10SV)}</td>
-          <td>Total CB Value: ${money(t10CBV)}</td>
-        </tr>
-      `;
-      host.appendChild(t10Totals);
-
-      const totalTitle = document.createElement("h2");
-      totalTitle.className = "groupTitle";
-      totalTitle.textContent = "Total(IMSF&BEER)";
-      host.appendChild(totalTitle);
-
-      const totalTable = document.createElement("table");
-      totalTable.className = "totalsTable";
-
-      const totalOB = t9OB + t10OB;
-      const totalCB = t9CB + t10CB;
-      const totalSales = t9Sales + t10Sales;
-      const totalSV = t9SV + t10SV;
-      const totalCBV = t9CBV + t10CBV;
-
-      totalTable.innerHTML = `
-        <tr>
-          <td>Total OB BOT: ${money(totalOB)}</td>
-          <td>Total CB BOT: ${money(totalCB)}</td>
-          <td>Total Sales BOT: ${money(totalSales)}</td>
-          <td>Total Sales Value: ${money(totalSV)}</td>
-          <td>Total CB Value: ${money(totalCBV)}</td>
-        </tr>
-      `;
-      host.appendChild(totalTable);
+      // IMSF and BEER + total could be added here similarly if you want
     }
 
-    // --- submit / edit / erase / clear / next day ---
-    // (use the same handlers you already had; they operate on `records`)
-
-    // ---------------- STORE TO CLOUD (objects, no nested arrays) ----------------
-    async function storeToCloud() {
-      if (!currentUser) {
-        alert("Please sign in on login.html first.");
+    // ---------- FORM SUBMIT ----------
+    document.getElementById("information").onsubmit = function(e) {
+      e.preventDefault();
+      const brand = document.getElementById("brand").value.trim();
+      const ml    = Number(document.getElementById("ml").value || 0);
+      const ob    = Number(document.getElementById("ob").value || 0);
+      const cb    = Number(document.getElementById("cb").value || 0);
+      const price = Number(document.getElementById("price").value || 0);
+      if (!brand || !ml || !price) {
+        alert("Brand, ML, and Price are required.");
         return;
       }
-      if (!records || records.length === 0) {
-        if (!confirm("No records. Store empty list?")) return;
-      }
+      const sales = ob - cb;
+      records.push([brand, ml, ob, cb, sales, price, price * sales, price * cb]);
+      saveAndRender();
+      this.reset();
+    };
 
-      const recordsForFirestore = records.map(r => ({
+    // ---------- NEXT DAY: OB = old CB, CB = 0 ----------
+    document.getElementById("nextDayBtn").onclick = function () {
+      if (records.length === 0) return alert("Table is empty.");
+      if (!confirm("Next Day? OB = previous CB, CB reset to 0, sales recalculated.")) return;
+
+      records = records.map(r => {
+        const brand = r[0];
+        const ml    = r[1];
+        const oldCB = r[3] || 0;
+        const price = r[5] || 0;
+
+        const newOB = oldCB;    // OB = old CB
+        const newCB = 0;        // CB reset to 0
+        const sales = newOB - newCB;
+        const sv    = price * sales;
+        const cbv   = price * newCB;
+
+        return [brand, ml, newOB, newCB, sales, price, sv, cbv];
+      });
+
+      saveAndRender();
+      alert("Next day applied.");
+    };
+
+    // ---------- STORE TO CLOUD ----------
+    async function saveToCloud() {
+      if (!currentUser) return alert("Please Login first!");
+      if (records.length === 0) return alert("No data to save.");
+
+      const listName = prompt("Enter name for this report (e.g. date):", new Date().toLocaleDateString());
+      if (!listName) return;
+
+      // convert inner arrays to objects to avoid nested-array issues [web:113]
+      const dataForFirestore = records.map(r => ({
         brand: r[0],
         ml: r[1],
         ob: r[2],
@@ -447,105 +346,115 @@
         cbv: r[7]
       }));
 
-      const payload = {
-        uid: currentUser.uid,
-        createdAt: Date.now(),
-        records: recordsForFirestore
-      };
-
-      if (currentListId) {
-        await setDoc(doc(db, "lists", currentListId), payload);
-      } else {
-        const ref = await addDoc(collection(db, "lists"), payload);
-        currentListId = ref.id;
+      try {
+        await db.collection("users")
+          .doc(currentUser.uid)
+          .collection("reports")
+          .add({
+            name: listName,
+            data: dataForFirestore,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        alert("Saved to Cloud successfully!");
+      } catch (e) {
+        console.error(e);
+        alert("Error saving: " + e.message);
       }
-
-      alert("Data stored to cloud.");
     }
 
-    storeCloudBtn.addEventListener("click", () => {
-      storeToCloud().catch(err => {
-        console.error(err);
-        alert("Error storing to cloud.");
-      });
-    });
+    document.getElementById("storeCloudBtn").onclick = () => {
+      saveToCloud();
+    };
 
-    // ---------------- CLOUD LISTS (load) ----------------
-    async function showCloudLists() {
-      if (!currentUser) {
-        alert("Please sign in on login.html first.");
-        return;
-      }
+    // ---------- LIST BUTTON: show & load cloud reports ----------
+    async function showCloudList() {
+      if (!currentUser) return alert("Please Login first!");
+      document.getElementById("listModal").style.display = "block";
+      const listDiv = document.getElementById("cloudDataList");
+      listDiv.innerHTML = "Fetching...";
 
-      const q = query(collection(db, "lists"), where("uid", "==", currentUser.uid));
-      const snap = await getDocs(q);
+      try {
+        const snapshot = await db.collection("users")
+          .doc(currentUser.uid)
+          .collection("reports")
+          .orderBy("timestamp", "desc")
+          .get();
 
-      const docsArr = [];
-      snap.forEach(docSnap => {
-        const data = docSnap.data();
-        docsArr.push({
-          id: docSnap.id,
-          createdAt: data.createdAt || 0,
-          count: (data.records || []).length
+        listDiv.innerHTML = "";
+        if (snapshot.empty) {
+          listDiv.innerHTML = "No cloud records found.";
+          return;
+        }
+
+        snapshot.forEach(docSnap => {
+          const d = docSnap.data();
+          const div = document.createElement("div");
+          div.style.margin = "10px 0";
+          const count = (d.data || []).length;
+          div.innerHTML = `<strong>${d.name}</strong> (${count} items)
+            <button onclick="loadCloudRecord('${docSnap.id}')">Load</button>`;
+          listDiv.appendChild(div);
         });
-      });
-
-      if (docsArr.length === 0) {
-        alert("No cloud lists found.");
-        return;
+      } catch (e) {
+        console.error(e);
+        listDiv.innerHTML = "Error loading list: " + e.message;
       }
-
-      docsArr.sort((a, b) => a.createdAt - b.createdAt);
-
-      let msg = "Your cloud lists:\n";
-      docsArr.forEach((d, i) => {
-        const date = new Date(d.createdAt).toLocaleString();
-        msg += `${i + 1}) ${date} – ${d.count} rows\n`;
-      });
-      msg += "\nEnter number to load:";
-
-      const choiceStr = prompt(msg);
-      if (choiceStr === null) return;
-      const idx = parseInt(choiceStr, 10) - 1;
-      if (isNaN(idx) || idx < 0 || idx >= docsArr.length) {
-        alert("Invalid choice.");
-        return;
-      }
-
-      const chosen = docsArr[idx];
-      const docSnap = await getDoc(doc(db, "lists", chosen.id));
-      if (!docSnap.exists()) {
-        alert("List not found.");
-        return;
-      }
-
-      const data = docSnap.data();
-      const recs = data.records || [];
-
-      records = recs.map(o => [
-        o.brand,
-        o.ml,
-        o.ob,
-        o.cb,
-        o.sales,
-        o.price,
-        o.sv,
-        o.cbv
-      ]);
-
-      currentListId = chosen.id;
-      renderGroupedTables();
     }
 
-    listBtn.addEventListener("click", () => {
-      showCloudLists().catch(err => {
-        console.error(err);
-        alert("Error loading cloud lists.");
-      });
-    });
+    document.getElementById("listBtn").onclick = () => showCloudList();
 
-    // ---------------- Initial load ----------------
-    renderBrandOptions("");
+    window.loadCloudRecord = async (id) => {
+      if (!currentUser) return alert("Please Login first!");
+      if (!confirm("Overwrite local table with this cloud data?")) return;
+
+      try {
+        const docSnap = await db.collection("users")
+          .doc(currentUser.uid)
+          .collection("reports")
+          .doc(id)
+          .get();
+
+        if (!docSnap.exists) {
+          alert("Report not found.");
+          return;
+        }
+
+        const d = docSnap.data();
+        const recs = d.data || [];
+
+        // convert back to arrays
+        records = recs.map(o => [
+          o.brand, o.ml, o.ob, o.cb, o.sales, o.price, o.sv, o.cbv
+        ]);
+
+        saveAndRender();
+        document.getElementById("listModal").style.display = "none";
+      } catch (e) {
+        console.error(e);
+        alert("Error loading record: " + e.message);
+      }
+    };
+
+    // ---------- CLEAR ALL ----------
+    function clearAll() {
+      if (confirm("Clear local table?") && prompt("Type 'yes' to confirm") === "yes") {
+        records = [];
+        saveAndRender();
+      }
+    }
+    window.clearAll = clearAll;
+
+    // ---------- Brand suggestions + price auto ----------
+    document.getElementById("brand").addEventListener("input", e => {
+      renderBrandOptions(e.target.value);
+      autoApplyPrice();
+    });
+    document.getElementById("brand").addEventListener("focus", e => {
+      renderBrandOptions(e.target.value);
+    });
+    document.getElementById("ml").addEventListener("change", autoApplyPrice);
+
+    // Initial render
     renderGroupedTables();
   </script>
 </body>
