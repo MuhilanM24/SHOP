@@ -210,14 +210,20 @@
 
     // expose handler for Google Identity callback
     window.handleCredentialResponse = function(response) {
+      console.log("Google response:", response);          // debug
       const payload = decodeJWT(response.credential);
+      console.log("Payload:", payload);                   // debug
+
       currentUser = {
         uid: payload.sub,
         name: payload.name,
         email: payload.email
       };
-      document.getElementById("userInfo").textContent =
-        "Signed in as: " + currentUser.name + " (" + currentUser.email + ")";
+      const ui = document.getElementById("userInfo");
+      if (ui) {
+        ui.textContent =
+          "Signed in as: " + currentUser.name + " (" + currentUser.email + ")";
+      }
     };
 
     function decodeJWT(token) {
