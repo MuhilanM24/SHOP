@@ -815,24 +815,29 @@ const firebaseConfig = {
     document.getElementById("logoutBtn").onclick = () => auth.signOut();
 
     document.getElementById("nextDayBtn").onclick = () => {
-      if (records.length === 0) return alert("Table is empty.");
-      if (!confirm("Next Day?\nOB = previous CB, CB reset to 0, sales recalculated.")) return;
-      records = records.map(r => {
-        const brand = r[0];
-        const ml    = r[1];
-        const oldCB = Number(r[3] || 0);
-        const price = Number(r[5] || 0);
-        const newOB = oldCB;
-        const newCB = 0;
-        const sales = newOB - newCB;
-        const sv    = price * sales;
-        const cbv   = price * newCB;
-        return [brand, ml, newOB, newCB, sales, price, sv, cbv];
-      });
-      saveData();
-      renderGroupedTables();
-      alert("Next day applied.");
-    };
+  if (records.length === 0) return alert("Table is empty.");
+  if (!confirm("Next Day?\nOB = previous CB, CB unchanged, sales recalculated.")) return;
+
+  records = records.map(r => {
+    const brand = r[0];
+    const ml    = r[1];
+    const oldCB = Number(r[3] || 0);
+    const price = Number(r[5] || 0);
+
+    const newOB = oldCB;        // OB = old CB
+    const newCB = oldCB;        // CB stays same
+    const sales = newOB - newCB;  // usually 0
+    const sv    = price * sales;
+    const cbv   = price * newCB;
+
+    return [brand, ml, newOB, newCB, sales, price, sv, cbv];
+  });
+
+  saveData();
+  renderGroupedTables();
+  alert("Next day applied.");
+};
+
 
     async function storeToCloud() {
       if (!currentUser) return alert("Please login first.");
