@@ -940,108 +940,117 @@
       host.appendChild(totalTable);
     }
 
-   /* --------- EDIT ALL (TABLE 1–8, OB/CB/Sales editable) --------- */
-/* --------- EDIT ALL (OB & Sales editable, CB auto) --------- */
+/* --------- EDIT ALL (all tables, OB & Sales editable) --------- */
 const editAllBtn = document.getElementById("editAllBtn");
 const saveAllBtn = document.getElementById("saveAllBtn");
-let currentEditGroupIndex = null;
+let editAllActive = false;
 
 editAllBtn.addEventListener("click", function () {
-  const tableNoStr = prompt("Enter Table Number (1-8) to Edit All OB & Sales:");
-  if (tableNoStr === null) return;
-
-  const tableNo = parseInt(tableNoStr, 10);
-  if (!Number.isInteger(tableNo) || tableNo < 1 || tableNo > 8) {
-    alert("Please enter a number from 1 to 8.");
+  if (editAllActive) {
+    alert("Already in Edit All mode. Click SAVE to finish.");
     return;
   }
+
+  // fresh DOM
+  renderGroupedTables();
 
   const host = document.getElementById("groups");
-  const allTables = host.querySelectorAll("table");
+  const tables = host.querySelectorAll("table");
 
-  // main tables indices: 0,2,4,6,8,10,12,14
-  const mainTableIndex = (tableNo - 1) * 2;
-  const table = allTables[mainTableIndex];
+  // main tables are all the ones that have header "S.No"
+  tables.forEach(t => {
+    const headerFirstCell = t.querySelector("thead th");
+    if (!headerFirstCell) return;
+    if (headerFirstCell.textContent.trim() !== "S.No") return;
 
-  if (!table) {
-    alert("Table not found.");
-    return;
-  }
+    const rows = t.querySelectorAll("tbody tr");
+    rows.forEach(row => {
+      const cells = row.querySelectorAll("td");
+      if (cells.length < 9) return; // skip "No records"
+      const obCell    = cells[3];
+      const salesCell = cells[5];
+      obCell.contentEditable = "true";
+      salesCell.contentEditable = "true";
+      obCell.classList.add("editing");
+      salesCell.classList.add("editing");
+    });
+  });
 
-  currentEditGroupIndex = tableNo - 1;
-
-  // make OB (3) and Sales (5) editable
-  for (let i = 1; i < table.rows.length; i++) {
-    const row = table.rows[i];
-    const obCell    = row.cells[3];
-    const salesCell = row.cells[5];
-    if (!obCell || !salesCell) continue;
-
-    obCell.contentEditable    = "true";
-    salesCell.contentEditable = "true";
-
-    obCell.classList.add("editing");
-    salesCell.classList.add("editing");
-  }
-
+  editAllActive = true;
   editAllBtn.style.display = "none";
   saveAllBtn.style.display = "inline-block";
 });
 
 saveAllBtn.addEventListener("click", function () {
-  if (currentEditGroupIndex === null) return;
+  if (!editAllActive) return;
 
   const host = document.getElementById("groups");
-  const allTables = host.querySelectorAll("table");
-  const mainTableIndex = currentEditGroupIndex * 2;
-  const table = allTables[mainTableIndex];
-  if (!table) return;
+  const tables = host.querySelectorAll("table");
 
-  const g = GROUPS[currentEditGroupIndex];
+  // Rebuild records from each GROUP using current DOM values
+  GROUPS.forEach((g, groupIndex) => {
+    // Take all rows for this group from records, sorted by price (same as renderGroupedTables)
+    const groupRows = records
+      .map((rec, idx) => ({ rec, idx }))
+      .filter(x => g.filter(x.rec))
+      .sort((a, b) => Number(a.rec[5]) - Number(b.rec[5]));
 
-  // Same order as renderGroupedTables (by price)
-  const groupRows = records
-    .map((rec, idx) => ({ rec, idx }))
-    .filter(x => g.filter(x.rec))
-    .sort((a, b) => Number(a.rec[5]) - Number(b.rec[5]));
+    if (groupRows.length === 0) return;
 
-  for (let i = 1; i < table.rows.length && i <= groupRows.length; i++) {
-    const rowEl = table.rows[i];
-    const obCell    = rowEl.cells[3];
-    const cbCell    = rowEl.cells[4];
-    const salesCell = rowEl.cells[5];
-    if (!obCell || !cbCell || !salesCell) continue;
+    // main table index: 0,2,4,... for groupIndex 0..7
+    const mainTableIndex = groupIndex * 2;
+    const table = tables[mainTableIndex];
+    if (!table) return;
 
-    obCell.contentEditable    = "false";
-    salesCell.contentEditable = "false";
+    const bodyRows = table.querySelectorAll("tbody tr");
+    let gi = 0;
+    bodyRows.forEach(rowEl => {
+      const cells = rowEl.querySelectorAll("td");
+      if (cells.length < 9) return;
 
-    obCell.classList.remove("editing");
-    salesCell.classList.remove("editing");
+      const obCell    = cells[3];
+      const cbCell    = cells[4];
+      const salesCell = cells[5];
+      const priceCell = cells[6];
+      const svCell    = cells[7];
+      const cbvCell   = cells[8];
 
-    const newOB    = parseFloat(obCell.textContent    || 0);
-    const newSales = parseFloat(salesCell.textContent || 0);
-    const newCB    = newOB - newSales;   // CB auto from OB & Sales
+      obCell.contentEditable = "false";
+      salesCell.contentEditable = "false";
+      obCell.classList.remove("editing");
+      salesCell.classList.remove("editing");
 
-    const recIndex = groupRows[i - 1].idx;
-    const rec = records[recIndex];
+      const newOB    = Number(obCell.textContent || 0);
+      const newSales = Number(salesCell.textContent || 0);
+      const price    = Number(priceCell.textContent || 0);
+      const newCB    = newOB - newSales;
+      const newSV    = price * newSales;
+      const newCBV   = price * newCB;
 
-    rec[2] = newOB;        // OB
-    rec[4] = newSales;     // Sales
-    rec[3] = newCB;        // CB (auto)
-    rec[6] = rec[5] * rec[4]; // Sales Value
-    rec[7] = rec[5] * rec[3]; // CB Value
+      cbCell.textContent  = money(newCB);
+      svCell.textContent  = money(newSV);
+      cbvCell.textContent = money(newCBV);
 
-    // update CB cell text for user
-    cbCell.textContent = newCB;
-  }
+      const recIndex = groupRows[gi].idx;
+      const rec = records[recIndex];
+      rec[2] = newOB;     // OB
+      rec[4] = newSales;  // Sales
+      rec[3] = newCB;     // CB
+      rec[6] = newSV;     // Sales Value
+      rec[7] = newCBV;    // CB Value
+
+      gi++;
+    });
+  });
 
   saveData();
   renderGroupedTables();
 
-  currentEditGroupIndex = null;
+  editAllActive = false;
   saveAllBtn.style.display = "none";
   editAllBtn.style.display = "inline-block";
 });
+
 
     saveAllBtn.addEventListener("click", function () {
       if (currentEditGroupIndex === null) return;
