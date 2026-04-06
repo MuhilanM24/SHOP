@@ -814,7 +814,14 @@
         const rows = records
           .filter(g.filter)
           .slice()
-          .sort((a, b) => Number(a[5]) - Number(b[5]));
+           .sort((a, b) => {
+            const priceA = Number(a.rec[5]);
+            const priceB =Number(b.rec[5]);
+            if (priceA !== priceB) return priceA - priceB;
+            const brandA = (a.rec[0] || "").tolowercase();
+            const brandB = (b.rec[0] || "").tolowercase();
+            return brandA < brandB ? -1 : brandB ? 1 : 0;
+                  });
 
         const totalOB = sumField(rows, 2);
         const totalCB = sumField(rows, 3);
