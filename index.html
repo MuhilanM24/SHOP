@@ -820,7 +820,7 @@
             if (priceA !== priceB) return priceA - priceB;
             const brandA = (a.rec[0] || "").tolowercase();
             const brandB = (b.rec[0] || "").tolowercase();
-            return brandA < brandB ? -1 : brandB ? 1 : 0;
+            return brandA.localeCompare(brandB);
                   });
 
         const totalOB = sumField(rows, 2);
