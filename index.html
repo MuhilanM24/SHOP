@@ -814,7 +814,7 @@
         const rows = records
           .filter(g.filter)
           .slice()
-           .sort((a, b) => {
+  .sort((a, b) => {
             const priceA = Number(a.rec[5]);
             const priceB =Number(b.rec[5]);
             if (priceA !== priceB) return priceA - priceB;
