@@ -814,7 +814,7 @@
         const rows = records
           .filter(g.filter)
           .slice()
-  .sort((a, b) => {
+          .sort((a, b) => {
             const priceA = Number(a.rec[5]);
             const priceB =Number(b.rec[5]);
             if (priceA !== priceB) return priceA - priceB;
@@ -947,6 +947,9 @@
       host.appendChild(totalTable);
     }
 
+
+
+
 /* --------- EDIT ALL (all tables, OB & Sales editable) --------- */
 const editAllBtn = document.getElementById("editAllBtn");
 const saveAllBtn = document.getElementById("saveAllBtn");
@@ -1057,6 +1060,13 @@ saveAllBtn.addEventListener("click", function () {
   saveAllBtn.style.display = "none";
   editAllBtn.style.display = "inline-block";
 });
+
+
+
+
+
+
+
 
 
     saveAllBtn.addEventListener("click", function () {
