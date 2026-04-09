@@ -21,7 +21,10 @@
       width: 95%;
       max-width: 1100px;
     }
-    th, td { border: 1px solid #333; padding: 6px 10px; }
+    th, td {
+      border: 1px solid #333;
+      padding: 6px 10px;
+    }
     th { background: #f1e2c6; }
     .groupTitle { text-align: center; margin: 18px 0 6px; }
     .totalsTable {
@@ -31,8 +34,20 @@
       background: yellow;
       font-weight: bold;
     }
-    #qwe { background: red; color: #fff; padding: 8px 14px; border: 0; cursor: pointer; }
-    #muhil { background: green; color: #fff; padding: 8px 14px; border: 0; cursor: pointer; }
+    #qwe, .qwe {
+      background: red;
+      color: #fff;
+      padding: 8px 14px;
+      border: 0;
+      cursor: pointer;
+    }
+    #muhil, .muhil {
+      background: green;
+      color: #fff;
+      padding: 8px 14px;
+      border: 0;
+      cursor: pointer;
+    }
     input, select { padding: 6px; }
     .editing { background: #ffeeba; }
 
@@ -89,23 +104,16 @@
       #cloudButtons {
         display: none !important;
       }
-      body {
-        background: white !important;
-      }
+      body { background: white !important; }
       table {
         width: 100% !important;
         max-width: 100% !important;
       }
-      .totalsTable {
-        page-break-inside: avoid;
-      }
-      h2 {
-        page-break-after: avoid;
-      }
+      .totalsTable { page-break-inside: avoid; }
+      h2 { page-break-after: avoid; }
     }
   </style>
 </head>
-
 <body>
   <!-- Google login bar -->
   <div class="auth-bar">
@@ -122,7 +130,6 @@
     <label for="brand">Brand name</label>
     <input type="text" id="brand" placeholder="Type brand name..." autocomplete="off" />
     <datalist id="suggestions"></datalist>
-
     <br><br>
 
     <label for="ml">ML</label>
@@ -136,35 +143,29 @@
       <option value="750">750 ml</option>
       <option value="1000">1000 ml</option>
     </select>
-
     <br><br>
 
     <label for="ob">Enter opening balance</label>
     <input type="number" id="ob" name="ob" placeholder="Enter the number" />
-
     <br><br>
 
     <label for="cb">Enter closing balance</label>
     <input type="number" id="cb" name="cb" placeholder="Enter the number" />
-
     <br><br>
 
     <label for="price">price</label>
     <input type="number" id="price" name="price" placeholder="price" />
-
     <br><br>
 
     <input type="reset" value="clear" />
     <input type="submit" value="submit" />
-
     <br><br><hr><hr>
 
     <button type="button" id="muhil">EDIT</button>
-
     <br><br><hr>
+
     <button type="button" id="editAllBtn">Edit All</button>
     <button type="button" id="saveAllBtn" style="display:none;">Save</button>
-
     <br><br><hr>
 
     <!-- New cloud-related buttons -->
@@ -173,13 +174,12 @@
       <button type="button" id="storeCloudBtn">☁️ STORE TO CLOUD</button>
       <button type="button" id="listBtn">📂 CLOUD LISTS</button>
     </div>
-
     <br><br><hr>
 
     <button type="button" id="qwe" onclick="clearAll()">Clear table</button>
     <br><br><hr>
-    <button type="button" id="printBtn" onclick="printReport()">Print / Save PDF</button>
 
+    <button type="button" id="printBtn" onclick="printReport()">Print / Save PDF</button>
   </form>
 
   <!-- 8 tables -->
@@ -188,7 +188,6 @@
   <!-- Erase row UI -->
   <div id="eraseBox" style="width:95%;max-width:1100px;margin:10px auto;text-align:center;">
     <button type="button" id="eraseBtn" class="qwe">Erase Row</button>
-
     <div id="eraseForm" style="display:none;margin-top:10px;">
       <input type="number" id="eraseTableNo" min="1" max="8" placeholder="Table no (1-8)">
       <input type="number" id="eraseRowNo" min="1" placeholder="Row no (N)">
@@ -212,9 +211,9 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <script>
-    /* ---------------- PRICE CHART (your full list) ---------------- */
+    /* ---------------- PRICE CHART ---------------- */
     const PRICELIST = [
-  { brand: "Old king xxxx rum", ml: 180, price: 140 },
+         { brand: "Old king xxxx rum", ml: 180, price: 140 },
         { brand: "Old king xxxx rum", ml: 375, price: 280 },
         { brand: "Old king xxxx rum", ml: 750, price: 560 },
         { brand: "Mens club dlx bdy", ml: 180, price:140 },
@@ -732,7 +731,6 @@
       {brand: "Signout pre clasic bdy", ml: 180, price:330},
       {brand: "Signout pre clasic bdy", ml: 375, price:660},
       {brand: "Signout pre clasic bdy", ml: 650, price:1320},
-
     ];
 
     function printReport() {
@@ -792,15 +790,31 @@
     function money(n) { return (Number(n) || 0).toFixed(2); }
     function sumField(arr, idx) { return arr.reduce((a, r) => a + (Number(r[idx]) || 0), 0); }
 
+    // shared comparator: price first, then brand
+    function compareByPriceThenBrand(a, b) {
+      const priceA = Number(a[5]);
+      const priceB = Number(b[5]);
+      if (priceA !== priceB) return priceA - priceB;
+      const brandA = (a[0] || "").toLowerCase();
+      const brandB = (b[0] || "").toLowerCase();
+      return brandA.localeCompare(brandB);
+    }
+    function compareObjByPriceThenBrand(x, y) {
+      // x, y are {rec, idx} or {r, idx}
+      const ra = x.rec || x.r;
+      const rb = y.rec || y.r;
+      return compareByPriceThenBrand(ra, rb);
+    }
+
     const GROUPS = [
-      { key: "180_140",   title: "Table 1: 180 ml (Price <= 140)",  filter: r => r[1] === 180 && r[5] <= 140 },
+      { key: "180_140",   title: "Table 1: 180 ml (Price <= 140)", filter: r => r[1] === 180 && r[5] <= 140 },
       { key: "180_170",   title: "Table 2: 180 ml (Price = 170)",  filter: r => r[1] === 180 && r[5] === 170 },
-      { key: "180_gt200", title: "Table 3: 180 ml (Price >= 200)",  filter: r => r[1] === 180 && r[5] >= 200 },
+      { key: "180_gt200", title: "Table 3: 180 ml (Price >= 200)", filter: r => r[1] === 180 && r[5] >= 200 },
       { key: "375",  title: "Table 4: 375 ml",  filter: r => r[1] === 375 },
       { key: "750",  title: "Table 5: 750 ml",  filter: r => r[1] === 750 },
       { key: "1000", title: "Table 6: 1000 ml", filter: r => r[1] === 1000 },
       { key: "650",  title: "Table 7: 650 ml",  filter: r => r[1] === 650 },
-      { key: "500",  title: "Table 8: 500 ml",  filter: r => r[1] === 500 },
+      { key: "500",  title: "Table 8: 500 ml",  filter: r => r[1] === 500 }
     ];
 
     function renderGroupedTables() {
@@ -814,7 +828,7 @@
         const rows = records
           .filter(g.filter)
           .slice()
-          .sort((a, b) => Number(a[5]) - Number(b[5]));
+          .sort(compareByPriceThenBrand);
 
         const totalOB = sumField(rows, 2);
         const totalCB = sumField(rows, 3);
@@ -940,149 +954,135 @@
       host.appendChild(totalTable);
     }
 
+    /* --------- EDIT ALL --------- */
+    const editAllBtn = document.getElementById("editAllBtn");
+    const saveAllBtn = document.getElementById("saveAllBtn");
+    let editAllActive = false;
+    let currentEditGroupIndex = null;
 
+    editAllBtn.addEventListener("click", function () {
+      if (editAllActive) {
+        alert("Already in Edit All mode. Click SAVE to finish.");
+        return;
+      }
 
+      renderGroupedTables();
 
-/* --------- EDIT ALL (all tables, OB & Sales editable) --------- */
-const editAllBtn = document.getElementById("editAllBtn");
-const saveAllBtn = document.getElementById("saveAllBtn");
-let editAllActive = false;
+      const host = document.getElementById("groups");
+      const tables = host.querySelectorAll("table");
 
-editAllBtn.addEventListener("click", function () {
-  if (editAllActive) {
-    alert("Already in Edit All mode. Click SAVE to finish.");
-    return;
-  }
+      tables.forEach(t => {
+        const headerFirstCell = t.querySelector("thead th");
+        if (!headerFirstCell) return;
+        if (headerFirstCell.textContent.trim() !== "S.No") return;
 
-  // fresh DOM
-  renderGroupedTables();
+        const rows = t.querySelectorAll("tbody tr");
+        rows.forEach(row => {
+          const cells = row.querySelectorAll("td");
+          if (cells.length < 9) return;
+          const obCell    = cells[3];
+          const salesCell = cells[5];
+          obCell.contentEditable = "true";
+          salesCell.contentEditable = "true";
+          obCell.classList.add("editing");
+          salesCell.classList.add("editing");
+        });
+      });
 
-  const host = document.getElementById("groups");
-  const tables = host.querySelectorAll("table");
-
-  // main tables are all the ones that have header "S.No"
-  tables.forEach(t => {
-    const headerFirstCell = t.querySelector("thead th");
-    if (!headerFirstCell) return;
-    if (headerFirstCell.textContent.trim() !== "S.No") return;
-
-    const rows = t.querySelectorAll("tbody tr");
-    rows.forEach(row => {
-      const cells = row.querySelectorAll("td");
-      if (cells.length < 9) return; // skip "No records"
-      const obCell    = cells[3];
-      const salesCell = cells[5];
-      obCell.contentEditable = "true";
-      salesCell.contentEditable = "true";
-      obCell.classList.add("editing");
-      salesCell.classList.add("editing");
+      editAllActive = true;
+      editAllBtn.style.display = "none";
+      saveAllBtn.style.display = "inline-block";
     });
-  });
 
-  editAllActive = true;
-  editAllBtn.style.display = "none";
-  saveAllBtn.style.display = "inline-block";
-});
+    function saveAllFromAllTables() {
+      const host = document.getElementById("groups");
+      const tables = host.querySelectorAll("table");
 
-saveAllBtn.addEventListener("click", function () {
-  if (!editAllActive) return;
+      GROUPS.forEach((g, groupIndex) => {
+        const groupRows = records
+          .map((rec, idx) => ({ rec, idx }))
+          .filter(x => g.filter(x.rec))
+          .sort(compareObjByPriceThenBrand);
 
-  const host = document.getElementById("groups");
-  const tables = host.querySelectorAll("table");
+        if (groupRows.length === 0) return;
 
-  // Rebuild records from each GROUP using current DOM values
-  GROUPS.forEach((g, groupIndex) => {
-    // Take all rows for this group from records, sorted by price (same as renderGroupedTables)
-    const groupRows = records
-      .map((rec, idx) => ({ rec, idx }))
-      .filter(x => g.filter(x.rec))
-      .sort((a, b) => Number(a.rec[5]) - Number(b.rec[5]));
+        const mainTableIndex = groupIndex * 2;
+        const table = tables[mainTableIndex];
+        if (!table) return;
 
-    if (groupRows.length === 0) return;
+        const bodyRows = table.querySelectorAll("tbody tr");
+        let gi = 0;
+        bodyRows.forEach(rowEl => {
+          const cells = rowEl.querySelectorAll("td");
+          if (cells.length < 9) return;
 
-    // main table index: 0,2,4,... for groupIndex 0..7
-    const mainTableIndex = groupIndex * 2;
-    const table = tables[mainTableIndex];
-    if (!table) return;
+          const obCell    = cells[3];
+          const cbCell    = cells[4];
+          const salesCell = cells[5];
+          const priceCell = cells[6];
+          const svCell    = cells[7];
+          const cbvCell   = cells[8];
 
-    const bodyRows = table.querySelectorAll("tbody tr");
-    let gi = 0;
-    bodyRows.forEach(rowEl => {
-      const cells = rowEl.querySelectorAll("td");
-      if (cells.length < 9) return;
+          obCell.contentEditable = "false";
+          salesCell.contentEditable = "false";
+          obCell.classList.remove("editing");
+          salesCell.classList.remove("editing");
 
-      const obCell    = cells[3];
-      const cbCell    = cells[4];
-      const salesCell = cells[5];
-      const priceCell = cells[6];
-      const svCell    = cells[7];
-      const cbvCell   = cells[8];
+          const newOB    = Number(obCell.textContent || 0);
+          const newSales = Number(salesCell.textContent || 0);
+          const price    = Number(priceCell.textContent || 0);
+          const newCB    = newOB - newSales;
+          const newSV    = price * newSales;
+          const newCBV   = price * newCB;
 
-      obCell.contentEditable = "false";
-      salesCell.contentEditable = "false";
-      obCell.classList.remove("editing");
-      salesCell.classList.remove("editing");
+          cbCell.textContent  = money(newCB);
+          svCell.textContent  = money(newSV);
+          cbvCell.textContent = money(newCBV);
 
-      const newOB    = Number(obCell.textContent || 0);
-      const newSales = Number(salesCell.textContent || 0);
-      const price    = Number(priceCell.textContent || 0);
-      const newCB    = newOB - newSales;
-      const newSV    = price * newSales;
-      const newCBV   = price * newCB;
+          const recIndex = groupRows[gi].idx;
+          const rec = records[recIndex];
+          rec[2] = newOB;
+          rec[4] = newSales;
+          rec[3] = newCB;
+          rec[6] = newSV;
+          rec[7] = newCBV;
 
-      cbCell.textContent  = money(newCB);
-      svCell.textContent  = money(newSV);
-      cbvCell.textContent = money(newCBV);
+          gi++;
+        });
+      });
 
-      const recIndex = groupRows[gi].idx;
-      const rec = records[recIndex];
-      rec[2] = newOB;     // OB
-      rec[4] = newSales;  // Sales
-      rec[3] = newCB;     // CB
-      rec[6] = newSV;     // Sales Value
-      rec[7] = newCBV;    // CB Value
+      saveData();
+      renderGroupedTables();
 
-      gi++;
-    });
-  });
+      editAllActive = false;
+      saveAllBtn.style.display = "none";
+      editAllBtn.style.display = "inline-block";
+    }
 
-  saveData();
-  renderGroupedTables();
-
-  editAllActive = false;
-  saveAllBtn.style.display = "none";
-  editAllBtn.style.display = "inline-block";
-});
-
-
-
-
-
-
-
-
-
-    saveAllBtn.addEventListener("click", function () {
-      if (currentEditGroupIndex === null) return;
+    function saveSingleGroup(idx) {
       const host = document.getElementById("groups");
       const allTables = host.querySelectorAll("table");
-      const mainTableIndex = currentEditGroupIndex * 2;
+      const mainTableIndex = idx * 2;
       const table = allTables[mainTableIndex];
       if (!table) return;
-      const g = GROUPS[currentEditGroupIndex];
+      const g = GROUPS[idx];
+
       const groupRows = records
-        .map((rec, idx) => ({ rec, idx }))
+        .map((rec, i) => ({ rec, idx: i }))
         .filter(x => g.filter(x.rec))
-        .sort((a, b) => Number(a.rec[5]) - Number(b.rec[5]));
+        .sort(compareObjByPriceThenBrand);
+
       for (let i = 1; i < table.rows.length && i <= groupRows.length; i++) {
         const rowEl = table.rows[i];
         const obCell = rowEl.cells[3];
         const cbCell = rowEl.cells[4];
         if (!obCell || !cbCell) continue;
+
         obCell.contentEditable = "false";
         cbCell.contentEditable = "false";
         obCell.classList.remove("editing");
         cbCell.classList.remove("editing");
+
         const newOB = parseFloat(obCell.textContent || 0);
         const newCB = parseFloat(cbCell.textContent || 0);
         const recIndex = groupRows[i - 1].idx;
@@ -1093,11 +1093,22 @@ saveAllBtn.addEventListener("click", function () {
         rec[6] = rec[5] * rec[4];
         rec[7] = rec[5] * rec[3];
       }
+
       saveData();
       renderGroupedTables();
       currentEditGroupIndex = null;
       saveAllBtn.style.display = "none";
       editAllBtn.style.display = "inline-block";
+    }
+
+    saveAllBtn.addEventListener("click", function () {
+      if (editAllActive) {
+        saveAllFromAllTables();
+        return;
+      }
+      if (typeof currentEditGroupIndex === "number") {
+        saveSingleGroup(currentEditGroupIndex);
+      }
     });
 
     form.addEventListener("submit", function(e) {
@@ -1131,9 +1142,11 @@ saveAllBtn.addEventListener("click", function () {
         localStorage.removeItem("editIndex");
         alert("Row updated successfully.");
       } else {
-        const duplicateInSameTable = records.some(r =>
-          GROUPS[groupIndex].filter(r) && r[0].toLowerCase() === brand.toLowerCase()
-        );
+        const duplicateInSameTable = records.some(r => {
+          const inSameGroup = GROUPS[groupIndex].filter(r);
+          const sameBrand = (r[0] || "").toLowerCase() === brand.toLowerCase();
+          return inSameGroup && sameBrand;
+        });
         if (duplicateInSameTable) {
           alert(`"${brand}" already exists in Table ${groupIndex + 1}. Not added.`);
           return;
@@ -1171,7 +1184,7 @@ saveAllBtn.addEventListener("click", function () {
       const tableRows = records
         .map((rec, idx) => ({ rec, idx }))
         .filter(x => g.filter(x.rec))
-        .sort((a, b) => Number(a.rec[5]) - Number(b.rec[5]));
+        .sort(compareObjByPriceThenBrand);
       if (tableRows.length === 0) {
         alert("No records in this table");
         return;
@@ -1204,7 +1217,7 @@ saveAllBtn.addEventListener("click", function () {
       const groupRecords = records
         .map((r, idx) => ({ r, idx }))
         .filter(obj => g.filter(obj.r))
-        .sort((a, b) => Number(a.r[5]) - Number(b.r[5]));
+        .sort((a, b) => compareByPriceThenBrand(a.r, b.r));
       if (groupRecords.length === 0) {
         alert("No records in this table.");
         return;
@@ -1241,15 +1254,15 @@ saveAllBtn.addEventListener("click", function () {
     window.clearAll = clearAll;
 
     /* ---------------- GOOGLE LOGIN + FIRESTORE ---------------- */
-const firebaseConfig = {
-  apiKey: "AIzaSyCYBSq_NTLy0lqcL1bXd3iGtjr16fZEvBA",
-  authDomain: "store-45bb2.firebaseapp.com",
-  projectId: "store-45bb2",
-  storageBucket: "store-45bb2.firebasestorage.app",
-  messagingSenderId: "385087942859",
-  appId: "1:385087942859:web:47de5f5375550a26bb6b4e",
-  measurementId: "G-V7PY6W7VND"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyCYBSq_NTLy0lqcL1bXd3iGtjr16fZEvBA",
+      authDomain: "store-45bb2.firebaseapp.com",
+      projectId: "store-45bb2",
+      storageBucket: "store-45bb2.firebasestorage.app",
+      messagingSenderId: "385087942859",
+      appId: "1:385087942859:web:47de5f5375550a26bb6b4e",
+      measurementId: "G-V7PY6W7VND"
+    };
 
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
@@ -1279,29 +1292,28 @@ const firebaseConfig = {
     document.getElementById("logoutBtn").onclick = () => auth.signOut();
 
     document.getElementById("nextDayBtn").onclick = () => {
-  if (records.length === 0) return alert("Table is empty.");
-  if (!confirm("Next Day?\nOB = previous CB, CB unchanged, sales recalculated.")) return;
+      if (records.length === 0) return alert("Table is empty.");
+      if (!confirm("Next Day?\nOB = previous CB, CB unchanged, sales recalculated.")) return;
 
-  records = records.map(r => {
-    const brand = r[0];
-    const ml    = r[1];
-    const oldCB = Number(r[3] || 0);
-    const price = Number(r[5] || 0);
+      records = records.map(r => {
+        const brand = r[0];
+        const ml    = r[1];
+        const oldCB = Number(r[3] || 0);
+        const price = Number(r[5] || 0);
 
-    const newOB = oldCB;        // OB = old CB
-    const newCB = oldCB;        // CB stays same
-    const sales = newOB - newCB;  // usually 0
-    const sv    = price * sales;
-    const cbv   = price * newCB;
+        const newOB = oldCB;
+        const newCB = oldCB;
+        const sales = newOB - newCB;
+        const sv    = price * sales;
+        const cbv   = price * newCB;
 
-    return [brand, ml, newOB, newCB, sales, price, sv, cbv];
-  });
+        return [brand, ml, newOB, newCB, sales, price, sv, cbv];
+      });
 
-  saveData();
-  renderGroupedTables();
-  alert("Next day applied.");
-};
-
+      saveData();
+      renderGroupedTables();
+      alert("Next day applied.");
+    };
 
     async function storeToCloud() {
       if (!currentUser) return alert("Please login first.");
