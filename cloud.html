@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cloud Lists - Shop 2605</title>
+  <style>
+    body {
+      margin: 0;
+      background: #20232a;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+    .topbar {
+      background: #111;
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .topbar h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+    .topbar button {
+      padding: 6px 12px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    #loginBtn { background:#0d6efd;color:white; }
+    #logoutBtn { background:#dc3545;color:white;display:none; }
+    #backBtn { background:#6c757d;color:white;margin-right:10px; }
+
+    .status {
+      margin: 10px 16px;
+      font-size: 14px;
+      color: #ddd;
+    }
+
+    .list-container {
+      margin: 10px 16px 20px;
+      background: #2c313c;
+      border-radius: 8px;
+      padding: 12px 14px;
+    }
+    .list-item {
+      padding: 8px 0;
+      border-bottom: 1px solid #444;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .list-item:last-child {
+      border-bottom: none;
+    }
+    .list-info {
+      flex: 1;
+    }
+    .list-info strong {
+      font-size: 16px;
+    }
+    .list-meta {
+      font-size: 12px;
+      color: #aaa;
+    }
+    .list-actions button {
+      margin-left: 6px;
+      padding: 4px 8px;
+      font-size: 12px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-load   { background:#0d6efd;color:white; }
+    .btn-rename { background:#ffc107;color:black; }
+    .btn-delete { background:#dc3545;color:white; }
+
+    .empty {
+      text-align:center;
+      padding:20px 0;
+      color:#aaa;
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div>
+      <button id="backBtn" onclick="location.href='index.html'">⬅ Back</button>
+      <h1 style="display:inline-block;margin-left:8px;">Cloud Lists</h1>
+    </div>
+    <div>
+      <button id="loginBtn">Google Login</button>
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </div>
+
+  <div class="status" id="userStatus">Not Logged In</div>
+
+  <div class="list-container">
+    <div id="cloudDataList">Login to see your cloud reports…</div>
+  </div>
+
+  <!-- Firebase compat SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    // Same config as calculator.html
+    const firebaseConfig = {
+      apiKey: "AIzaSyCYBSq_NTLy0lqcL1bXd3iGtjr16fZEvBA",
+      authDomain: "store-45bb2.firebaseapp.com",
+      projectId: "store-45bb2",
+      storageBucket: "store-45bb2.firebasestorage.app",
+      messagingSenderId: "385087942859",
+      appId: "1:385087942859:web:47de5f5375550a26bb6b4e",
+      measurementId: "G-V7PY6W7VND"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const provider = new firebase.auth.GoogleAuthProvider();
+
+    let currentUser = null;
+
+    const statusEl = document.getElementById("userStatus");
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const listDiv = document.getElementById("cloudDataList");
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        currentUser = user;
+        statusEl.textContent = "User: " + (user.email || user.uid);
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "inline-block";
+        loadCloudLists();
+      } else {
+        currentUser = null;
+        statusEl.textContent = "Not Logged In";
+        loginBtn.style.display = "inline-block";
+        logoutBtn.style.display = "none";
+        listDiv.textContent = "Login to see your cloud reports…";
+      }
+    });
+
+    loginBtn.onclick = () => auth.signInWithPopup(provider);
+    logoutBtn.onclick = () => auth.signOut();
+
+    async function loadCloudLists() {
+      if (!currentUser) return;
+      listDiv.textContent = "Loading...";
+      try {
+        const snap = await db.collection("users")
+          .doc(currentUser.uid)
+          .collection("reports")
+          .orderBy("timestamp", "desc")
+          .get();
+        if (snap.empty) {
+          listDiv.innerHTML = '<div class="empty">No cloud reports found.</div>';
+          return;
+        }
+        listDiv.innerHTML = "";
+        snap.forEach(docSnap => {
+          const d = docSnap.data();
+          const id = docSnap.id;
+          const name = d.name || "(no name)";
+          const count = (d.data || []).length;
+          const time = d.timestamp && d.timestamp.toDate
+            ? d.timestamp.toDate().toLocaleString()
+            : "";
+
+          const div = document.createElement("div");
+          div.className = "list-item";
+          div.innerHTML = `
+            <div class="list-info">
+              <strong>${name}</strong>
+              <div class="list-meta">
+                ${count} rows ${time ? " • " + time : ""}
+              </div>
+            </div>
+            <div class="list-actions">
+              <button class="btn-load"   onclick="loadReportFromCloud('${id}')">Load</button>
+              <button class="btn-rename" onclick="renameReport('${id}', '${name.replace(/'/g, "\\'")}')">Rename</button>
+              <button class="btn-delete" onclick="deleteReport('${id}', '${name.replace(/'/g, "\\'")}')">Delete</button>
+            </div>
+          `;
+          listDiv.appendChild(div);
+        });
+      } catch (e) {
+        console.error(e);
+        listDiv.textContent = "Error: " + e.message;
+      }
+    }
+
+    // Load report into localStorage for calculator page to read
+    window.loadReportFromCloud = async function(id) {
+      if (!currentUser) return alert("Please login first.");
+      if (!confirm("Load this report into local storage for calculator?\n(Existing local data will be overwritten)")) return;
+      try {
+        const docSnap = await db.collection("users")
+          .doc(currentUser.uid)
+          .collection("reports")
+          .doc(id)
+          .get();
+        if (!docSnap.exists) {
+          alert("Report not found.");
+          return;
+        }
+        const d = docSnap.data();
+        const recs = d.data || [];
+        localStorage.setItem("calcrecords", JSON.stringify(
+          recs.map(o => [o.brand, o.ml, o.ob, o.cb, o.sales, o.price, o.sv, o.cbv])
+        ));
+        alert("Loaded to local storage.\nOpen Calculator page to see it.");
+      } catch (e) {
+        console.error(e);
+        alert("Error loading: " + e.message);
+      }
+    };
+
+    // Rename: change "name" field of the document
+    window.renameReport = async function(id, oldName) {
+      if (!currentUser) return alert("Please login first.");
+      const newName = prompt("Enter new name for this report:", oldName);
+      if (!newName) return;
+      try {
+        await db.collection("users")
+          .doc(currentUser.uid)
+          .collection("reports")
+          .doc(id)
+          .update({ name: newName });
+        alert("Renamed.");
+        loadCloudLists();
+      } catch (e) {
+        console.error(e);
+        alert("Error renaming: " + e.message);
+      }
+    };
+
+    // Delete: require typing "yes" and then remove document from Firestore
+    window.deleteReport = async function(id, name) {
+      if (!currentUser) return alert("Please login first.");
+
+      const text = prompt(`Type "yes" to delete report "${name}" permanently:`);
+      if (text === null) return; // cancelled
+      if (text.toLowerCase() !== "yes") {
+        alert("Delete cancelled.");
+        return;
+      }
+
+      try {
+        await db.collection("users")
+          .doc(currentUser.uid)
+          .collection("reports")
+          .doc(id)
+          .delete();
+        alert("Deleted.");
+        loadCloudLists();
+      } catch (e) {
+        console.error(e);
+        alert("Error deleting: " + e.message);
+      }
+    };
+  </script>
+</body>
+</html>
