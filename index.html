@@ -18,23 +18,31 @@
       text-align: center;
     }
     .wrapper h1 {
-      margin-bottom: 20px;
+      margin-bottom: 30px;
     }
-    .calc-btn {
+    .buttons {
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+    }
+    .btn-block {
+      text-align: center;
+    }
+    .img-btn {
       border: none;
       padding: 0;
       background: none;
       cursor: pointer;
     }
-    .calc-btn img {
-      width: 200px;
-      height: 200px;
+    .img-btn img {
+      width: 160px;
+      height: 160px;
       object-fit: contain;
       border-radius: 16px;
       box-shadow: 0 0 15px rgba(0,0,0,0.7);
       transition: transform 0.2s, box-shadow 0.2s;
     }
-    .calc-btn img:hover {
+    .img-btn img:hover {
       transform: scale(1.05);
       box-shadow: 0 0 25px rgba(0,0,0,0.9);
     }
@@ -49,12 +57,23 @@
   <div class="wrapper">
     <h1>SHOP NO: 2605</h1>
 
-    <!-- Picture button -->
-    <button class="calc-btn" onclick="location.href='calculator.html'">
-      <img src="calculator.jpg" alt="Calculator">
-    </button>
+    <div class="buttons">
+      <!-- Calculator button -->
+      <div class="btn-block">
+        <button class="img-btn" onclick="location.href='calculator.html'">
+          <img src="calculator.jpg" alt="Calculator">
+        </button>
+        <div class="label">Calculator</div>
+      </div>
 
-    <div class="label">Calculator</div>
+      <!-- Cloud lists button -->
+      <div class="btn-block">
+        <button class="img-btn" onclick="location.href='cloud.html'">
+          <img src="cloud.png" alt="Cloud Lists">
+        </button>
+        <div class="label">Cloud Lists</div>
+      </div>
+    </div>
   </div>
 </body>
 </html>
