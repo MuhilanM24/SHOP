@@ -2,54 +2,141 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shop 2605 - Home</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       margin: 0;
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      background: #111;
+      padding: 20px;
+      background: linear-gradient(135deg, #111 0%, #333 50%, #1a1a2e 100%);
       font-family: Arial, sans-serif;
       color: white;
+      overflow-x: hidden;
+      position: relative;
+    }
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(120,119,198,0.2) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255,119,198,0.2) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(120,219,255,0.15) 0%, transparent 50%);
+      animation: float 20s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      33% { transform: translateY(-15px) rotate(120deg); }
+      66% { transform: translateY(15px) rotate(240deg); }
     }
     .wrapper {
       text-align: center;
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 400px;
     }
     .wrapper h1 {
       margin-bottom: 30px;
+      font-size: clamp(1.8em, 5vw, 2.5em);
+      background: linear-gradient(45deg, #fff, #ccc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px rgba(255,255,255,0.5);
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+    @keyframes glow {
+      from { filter: drop-shadow(0 0 10px rgba(255,255,255,0.5)); }
+      to { filter: drop-shadow(0 0 20px rgba(255,255,255,0.8)); }
     }
     .buttons {
       display: flex;
-      gap: 40px;
-      justify-content: center;
+      flex-direction: column;
+      gap: 25px;
+      align-items: center;
     }
     .btn-block {
       text-align: center;
+      width: 100%;
     }
     .img-btn {
       border: none;
-      padding: 0;
-      background: none;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
       cursor: pointer;
+      box-shadow: 
+        0 8px 32px rgba(0,0,0,0.3),
+        inset 0 1px 0 rgba(255,255,255,0.2);
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 120px; /* Ensures touch target size */
+      width: 100%;
+    }
+    .img-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+    .img-btn:hover::before,
+    .img-btn:active::before {
+      left: 100%;
     }
     .img-btn img {
-      width: 160px;
-      height: 160px;
+      width: clamp(120px, 35vw, 160px);
+      height: clamp(120px, 35vw, 160px);
       object-fit: contain;
       border-radius: 16px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.7);
-      transition: transform 0.2s, box-shadow 0.2s;
+      display: block;
+      max-width: 100%;
     }
-    .img-btn img:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 25px rgba(0,0,0,0.9);
+    .img-btn:hover {
+      transform: translateY(-8px) scale(1.03);
+      box-shadow: 
+        0 20px 40px rgba(0,0,0,0.4),
+        0 0 30px rgba(120, 219, 255, 0.5),
+        inset 0 1px 0 rgba(255,255,255,0.3);
+      background: rgba(255, 255, 255, 0.15);
+    }
+    .img-btn:active {
+      transform: translateY(-4px) scale(1.01);
     }
     .label {
-      margin-top: 10px;
-      font-size: 18px;
-      letter-spacing: 1px;
+      margin-top: 12px;
+      font-size: clamp(16px, 4vw, 20px);
+      letter-spacing: 1.2px;
+      font-weight: bold;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      transition: color 0.3s;
+    }
+    .img-btn:hover + .label,
+    .img-btn:active + .label {
+      color: #78dbff;
+      text-shadow: 0 0 15px rgba(120,219,255,0.8);
     }
   </style>
 </head>
@@ -72,6 +159,14 @@
           <img src="cloud.png" alt="Cloud Lists">
         </button>
         <div class="label">Cloud Lists</div>
+      </div>
+
+      <!-- Calculator Beta Program button -->
+      <div class="btn-block">
+        <button class="img-btn" onclick="location.href='calculator-beta.html'">
+          <img src="Beta.jpg" alt="Calculator Beta">
+        </button>
+        <div class="label">Beta Program</div>
       </div>
     </div>
   </div>
