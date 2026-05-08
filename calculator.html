@@ -1,219 +1,398 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Ⓜ️GROUPS</title>
-  <style>
-    body { background: aquamarine; font-family: Arial, sans-serif; }
-    h1 { text-align: center; margin-top: 10px; }
-    form {
-      background: rgb(191, 183, 187);
-      text-align: center;
-      padding: 15px 18px;
-      margin: 10px auto;
-      width: fit-content;
-      border-radius: 10px;
-    }
-    table {
-      background: antiquewhite;
-      margin: 12px auto;
-      border-collapse: collapse;
-      width: 95%;
-      max-width: 1100px;
-    }
-    th, td {
-      border: 1px solid #333;
-      padding: 6px 10px;
-    }
-    th { background: #f1e2c6; }
-    .groupTitle { text-align: center; margin: 18px 0 6px; }
-    .totalsTable {
-      width: 95%;
-      max-width: 1100px;
-      margin: 0 auto 18px;
-      background: yellow;
-      font-weight: bold;
-    }
-    #qwe, .qwe {
-      background: red;
-      color: #fff;
-      padding: 8px 14px;
-      border: 0;
-      cursor: pointer;
-    }
-    #muhil, .muhil {
-      background: green;
-      color: #fff;
-      padding: 8px 14px;
-      border: 0;
-      cursor: pointer;
-    }
-    input, select { padding: 6px; }
-    .editing { background: #ffeeba; }
+<meta charset="UTF-8" />
+<title>Ⓜ️GROUPS</title>
+<style>
 
-    /* Auth bar */
-    .auth-bar {
-      background: #333;
-      color: white;
-      padding: 8px 10px;
-      margin: 5px auto 0;
-      max-width: 1100px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-radius: 6px;
-      font-size: 14px;
-    }
-    .auth-bar button {
-      padding: 5px 10px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
+/* ===== ANIMATIONS ONLY ===== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
 
-    /* Cloud list modal */
-    #listModal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
-      z-index: 999;
-    }
-    .modal-content {
-      background: white;
-      margin: 10% auto;
-      padding: 20px;
-      border-radius: 10px;
-      width: 80%;
-      max-width: 600px;
-    }
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
-    @media print {
-      form,
-      #printBtn,
-      #muhil,
-      #qwe,
-      .muhil,
-      .qwe,
-      #eraseBox,
-      #eraseForm,
-      #eraseBtn,
-      #eraseSubmit,
-      .auth-bar,
-      #listModal,
-      #cloudButtons {
-        display: none !important;
-      }
-      body { background: white !important; }
-      table {
-        width: 100% !important;
-        max-width: 100% !important;
-      }
-      .totalsTable { page-break-inside: avoid; }
-      h2 { page-break-after: avoid; }
-    }
-  </style>
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popIn {
+  0%   { opacity: 0; transform: scale(0.85); }
+  70%  { transform: scale(1.04); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Apply animations */
+body {
+  animation: fadeIn 0.5s ease;
+  background: aquamarine;
+  font-family: Arial, sans-serif;
+}
+
+h1 {
+  text-align: center;
+  margin-top: 10px;
+  animation: slideDown 0.6s ease;
+}
+
+form {
+  background: rgb(191, 183, 187);
+  text-align: center;
+  padding: 15px 18px;
+  margin: 10px auto;
+  width: fit-content;
+  border-radius: 10px;
+  animation: slideUp 0.7s ease;
+}
+
+table {
+  background: antiquewhite;
+  margin: 12px auto;
+  border-collapse: collapse;
+  width: 95%;
+  max-width: 1100px;
+  animation: slideUp 0.6s ease;
+}
+
+th, td {
+  border: 1px solid #333;
+  padding: 6px 10px;
+}
+
+th { background: #f1e2c6; }
+
+.groupTitle {
+  text-align: center;
+  margin: 18px 0 6px;
+  animation: slideDown 0.5s ease;
+}
+
+.totalsTable {
+  width: 95%;
+  max-width: 1100px;
+  margin: 0 auto 18px;
+  background: yellow;
+  font-weight: bold;
+  animation: slideUp 0.5s ease;
+}
+
+#qwe, .qwe {
+  background: red;
+  color: #fff;
+  padding: 8px 14px;
+  border: 0;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.15s;
+}
+#qwe:hover, .qwe:hover {
+  transform: scale(1.07);
+  opacity: 0.88;
+}
+
+#muhil, .muhil {
+  background: green;
+  color: #fff;
+  padding: 8px 14px;
+  border: 0;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.15s;
+}
+#muhil:hover, .muhil:hover {
+  transform: scale(1.07);
+  opacity: 0.88;
+}
+
+input, select { padding: 6px; }
+
+.editing { background: #ffeeba; }
+
+/* ===== BACK BUTTON ===== */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #333;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  margin: 10px 10px 0 10px;
+  animation: slideDown 0.5s ease;
+  transition: background 0.2s, transform 0.15s;
+}
+.back-btn:hover {
+  background: #555;
+  transform: translateX(-3px);
+}
+.back-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ===== AUTH BAR ===== */
+.auth-bar {
+  background: #333;
+  color: white;
+  padding: 8px 10px;
+  margin: 5px auto 0;
+  max-width: 1100px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 6px;
+  font-size: 14px;
+  animation: slideDown 0.6s ease;
+}
+.auth-bar button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.15s;
+}
+.auth-bar button:hover {
+  transform: scale(1.08);
+  opacity: 0.9;
+}
+
+/* ===== CLOUD LIST MODAL ===== */
+#listModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 999;
+  animation: fadeIn 0.3s ease;
+}
+.modal-content {
+  background: white;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 600px;
+  animation: popIn 0.4s ease;
+}
+
+/* ===== SUBMIT / RESET BUTTONS ===== */
+input[type="submit"],
+input[type="reset"] {
+  transition: transform 0.15s, opacity 0.15s;
+  cursor: pointer;
+}
+input[type="submit"]:hover { transform: scale(1.07); }
+input[type="reset"]:hover  { opacity: 0.75; }
+
+/* ===== PRINT ===== */
+@media print {
+  form,
+  #printBtn,
+  #muhil,
+  #qwe,
+  .muhil,
+  .qwe,
+  #eraseBox,
+  #eraseForm,
+  #eraseBtn,
+  #eraseSubmit,
+  .auth-bar,
+  #listModal,
+  #cloudButtons,
+  .back-btn {
+    display: none !important;
+  }
+
+  body { background: white !important; }
+
+  table {
+    width: 100% !important;
+    max-width: 100% !important;
+    background: white !important;
+    color: black !important;
+  }
+
+  th {
+    background: #f2f2f2 !important;
+    color: black !important;
+    border: 1px solid black !important;
+  }
+
+  td {
+    color: black !important;
+    border: 1px solid black !important;
+  }
+
+  .totalsTable {
+    background: #fffde7 !important;
+    color: black !important;
+    page-break-inside: avoid;
+  }
+
+  h2 { page-break-after: avoid; }
+  h1 { color: black !important; }
+
+  .groupTitle { color: black !important; }
+}
+
+</style>
 </head>
 <body>
-  <!-- Google login bar -->
-  <div class="auth-bar">
-    <span id="userStatus">Not Logged In</span>
-    <div>
-      <button id="loginBtn" style="background:#0d6efd;color:white;">Google Login</button>
-      <button id="logoutBtn" style="background:#dc3545;color:white;display:none;">Logout</button>
-    </div>
+
+<!-- ===== BACK BUTTON ===== -->
+<button class="back-btn" onclick="window.location.href='index.html'">
+  <svg viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" stroke-width="2.5"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path d="M19 12H5"/>
+    <path d="M12 19l-7-7 7-7"/>
+  </svg>
+  Back
+</button>
+
+<!-- ===== AUTH BAR ===== -->
+<div class="auth-bar">
+  <span id="userStatus">Not Logged In</span>
+  <div>
+    <button id="loginBtn"
+      style="background:#0d6efd;color:white;">
+      Google Login
+    </button>
+    <button id="logoutBtn"
+      style="background:#dc3545;color:white;display:none;">
+      Logout
+    </button>
   </div>
+</div>
 
-  <h1>SHOP NO:2605</h1>
+<h1>SHOP NO:2605</h1>
 
-  <form id="information">
-    <label for="brand">Brand name</label>
-    <input type="text" id="brand" placeholder="Type brand name..." autocomplete="off" />
-    <datalist id="suggestions"></datalist>
-    <br><br>
+<!-- ===== FORM ===== -->
+<form id="information">
 
-    <label for="ml">ML</label>
-    <select id="ml" name="ml">
-      <option value="">select</option>
-      <option value="180">180 ml</option>
-      <option value="325">325 ml</option>
-      <option value="375">375 ml</option>
-      <option value="500">500 ml</option>
-      <option value="650">650 ml</option>
-      <option value="750">750 ml</option>
-      <option value="1000">1000 ml</option>
-    </select>
-    <br><br>
+  <label for="brand">Brand name</label>
+  <input type="text" id="brand"
+    placeholder="Type brand name..."
+    autocomplete="off" />
+  <datalist id="suggestions"></datalist>
+  <br><br>
 
-    <label for="ob">Enter opening balance</label>
-    <input type="number" id="ob" name="ob" placeholder="Enter the number" />
-    <br><br>
+  <label for="ml">ML</label>
+  <select id="ml" name="ml">
+    <option value="">select</option>
+    <option value="180">180 ml</option>
+    <option value="325">325 ml</option>
+    <option value="375">375 ml</option>
+    <option value="500">500 ml</option>
+    <option value="650">650 ml</option>
+    <option value="750">750 ml</option>
+    <option value="1000">1000 ml</option>
+  </select>
+  <br><br>
 
-    <label for="cb">Enter closing balance</label>
-    <input type="number" id="cb" name="cb" placeholder="Enter the number" />
-    <br><br>
+  <label for="ob">Enter opening balance</label>
+  <input type="number" id="ob" name="ob"
+    placeholder="Enter the number" />
+  <br><br>
 
-    <label for="price">price</label>
-    <input type="number" id="price" name="price" placeholder="price" />
-    <br><br>
+  <label for="cb">Enter closing balance</label>
+  <input type="number" id="cb" name="cb"
+    placeholder="Enter the number" />
+  <br><br>
 
-    <input type="reset" value="clear" />
-    <input type="submit" value="submit" />
-    <br><br><hr><hr>
+  <label for="price">price</label>
+  <input type="number" id="price" name="price"
+    placeholder="price" />
+  <br><br>
 
-    <button type="button" id="muhil">EDIT</button>
-    <br><br><hr>
+  <input type="reset" value="clear" />
+  <input type="submit" value="submit" />
+  <br><br><hr><hr>
 
-    <button type="button" id="editAllBtn">Edit All</button>
-    <button type="button" id="saveAllBtn" style="display:none;">Save</button>
-    <br><br><hr>
+  <button type="button" id="muhil">EDIT</button>
+  <br><br><hr>
 
-    <!-- New cloud-related buttons -->
-    <div id="cloudButtons">
-      <button type="button" id="nextDayBtn">☀️ NEXT DAY (CB → OB)</button>
-      <button type="button" id="storeCloudBtn">☁️ STORE TO CLOUD</button>
-      <button type="button" id="listBtn">📂 CLOUD LISTS</button>
-    </div>
-    <br><br><hr>
+  <button type="button" id="editAllBtn">Edit All</button>
+  <button type="button" id="saveAllBtn"
+    style="display:none;">Save</button>
+  <br><br><hr>
 
-    <button type="button" id="qwe" onclick="clearAll()">Clear table</button>
-    <br><br><hr>
-
-    <button type="button" id="printBtn" onclick="printReport()">Print / Save PDF</button>
-  </form>
-
-  <!-- 8 tables -->
-  <div id="groups"></div>
-
-  <!-- Erase row UI -->
-  <div id="eraseBox" style="width:95%;max-width:1100px;margin:10px auto;text-align:center;">
-    <button type="button" id="eraseBtn" class="qwe">Erase Row</button>
-    <div id="eraseForm" style="display:none;margin-top:10px;">
-      <input type="number" id="eraseTableNo" min="1" max="8" placeholder="Table no (1-8)">
-      <input type="number" id="eraseRowNo" min="1" placeholder="Row no (N)">
-      <button type="button" id="eraseSubmit" class="muhil">Submit</button>
-    </div>
+  <div id="cloudButtons">
+    <button type="button" id="nextDayBtn">
+      ☀️ NEXT DAY (CB → OB)
+    </button>
+    <button type="button" id="storeCloudBtn">
+      ☁️ STORE TO CLOUD
+    </button>
+    <button type="button" id="listBtn">
+      📂 CLOUD LISTS
+    </button>
   </div>
+  <br><br><hr>
 
-  <!-- Cloud list modal -->
-  <div id="listModal">
-    <div class="modal-content">
-      <h2>Your Cloud Reports</h2>
-      <div id="cloudDataList">Loading...</div>
-      <br>
-      <button onclick="document.getElementById('listModal').style.display='none'">Close</button>
-    </div>
+  <button type="button" id="qwe" onclick="clearAll()">
+    Clear table
+  </button>
+  <br><br><hr>
+
+  <button type="button" id="printBtn" onclick="printReport()">
+    Print / Save PDF
+  </button>
+
+</form>
+
+<!-- ===== TABLES ===== -->
+<div id="groups"></div>
+
+<!-- ===== ERASE ROW ===== -->
+<div id="eraseBox"
+  style="width:95%;max-width:1100px;margin:10px auto;text-align:center;">
+  <button type="button" id="eraseBtn" class="qwe">
+    Erase Row
+  </button>
+  <div id="eraseForm" style="display:none;margin-top:10px;">
+    <input type="number" id="eraseTableNo"
+      min="1" max="8" placeholder="Table no (1-8)">
+    <input type="number" id="eraseRowNo"
+      min="1" placeholder="Row no (N)">
+    <button type="button" id="eraseSubmit" class="muhil">
+      Submit
+    </button>
   </div>
+</div>
 
-  <!-- Firebase compat SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<!-- ===== CLOUD MODAL ===== -->
+<div id="listModal">
+  <div class="modal-content">
+    <h2>Your Cloud Reports</h2>
+    <div id="cloudDataList">Loading...</div>
+    <br>
+    <button
+      onclick="document.getElementById('listModal').style.display='none'">
+      Close
+    </button>
+  </div>
+</div>
 
-  <script>
-    /* ---------------- PRICE CHART ---------------- */
-    const PRICELIST = [
-         { brand: "Old king xxxx rum", ml: 180, price: 140 },
+<!-- ===== FIREBASE ===== -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+
+/* ============================================
+   PRICE LIST
+============================================ */
+const PRICELIST = [
+{ brand: "Old king xxxx rum", ml: 180, price: 140 },
         { brand: "Old king xxxx rum", ml: 375, price: 280 },
         { brand: "Old king xxxx rum", ml: 750, price: 560 },
         { brand: "Mens club dlx bdy", ml: 180, price:140 },
@@ -678,7 +857,6 @@
          {brand: "Sterren 8 pre quality strong beer", ml: 650, price:160},
          {brand: "spiel triple strong", ml: 650, price:180},
          {brand: "Fosters original pre strong beer", ml: 650, price:170},
-      {brand: "Fosters original pre strong beer", ml: 500, price:150},
          {brand: "chennai kings no.1 ss beer", ml: 650, price:180},
          {brand: "thunder bolt supreme strong", ml: 650, price:170},
          {brand: "Godfather the legendary ss beer", ml: 650, price:180},
@@ -728,693 +906,490 @@
          {brand: "Fosters strong beer", ml: 500, price:150},
   {brand: "mgm limon vodka", ml: 180, price:250},
   {brand: "mgm limon vodka", ml: 375, price:500},
-  {brand: "mgm limon vodka", ml: 750, price:1000},
+  {brand: "mgm limon vodka", ml: 650, price:1000},
       {brand: "Signout pre clasic bdy", ml: 180, price:330},
       {brand: "Signout pre clasic bdy", ml: 375, price:660},
-      {brand: "Signout pre clasic bdy", ml: 750, price:1320},
-       {brand: "vasco 1498 pre bdy", ml: 180, price:250},
-      {brand: "vasco 1498 pre bdy", ml: 375, price:500},
-      {brand: "vasco 1498 pre bdy", ml: 750, price:1000},
-      {brand: "hunter refreshing st pre beer", ml:650,price:190},
-    ];
+      {brand: "Signout pre clasic bdy", ml: 650, price:1320},
+];
 
-    function printReport() {
-      renderGroupedTables();
-      window.print();
-    }
+/* ============================================
+   CORE LOGIC (UNCHANGED)
+============================================ */
+function printReport() {
+  renderGroupedTables();
+  window.print();
+}
 
-    const BRANDS = [...new Set(PRICELIST.map(x => x.brand))].sort();
+const BRANDS = [...new Set(PRICELIST.map(x => x.brand))].sort();
+const STORAGEKEY = "calcrecords";
+let records = [];
 
-    const STORAGEKEY = "calcrecords";
-    let records = [];
+function loadData() {
+  const saved = localStorage.getItem(STORAGEKEY);
+  if (saved) records = JSON.parse(saved);
+}
+function saveData() {
+  localStorage.setItem(STORAGEKEY, JSON.stringify(records));
+}
 
-    function loadData() {
-      const saved = localStorage.getItem(STORAGEKEY);
-      if (saved) records = JSON.parse(saved);
-    }
-    function saveData() {
-      localStorage.setItem(STORAGEKEY, JSON.stringify(records));
-    }
+const form        = document.getElementById("information");
+const brandInput  = document.getElementById("brand");
+const mlSelect    = document.getElementById("ml");
+const priceInput  = document.getElementById("price");
+const datalist    = document.getElementById("suggestions");
 
-    const form = document.getElementById("information");
-    const brandInput = document.getElementById("brand");
-    const mlSelect = document.getElementById("ml");
-    const priceInput = document.getElementById("price");
-    const datalist = document.getElementById("suggestions");
+brandInput.setAttribute("list", "suggestions");
 
-    brandInput.setAttribute("list", "suggestions");
-
-    function renderBrandOptions(filterText) {
-      datalist.innerHTML = "";
-      const q = (filterText || "").toLowerCase();
-      BRANDS
-        .filter(b => b.toLowerCase().includes(q))
-        .slice(0, 30)
-        .forEach(b => {
-          const opt = document.createElement("option");
-          opt.value = b;
-          datalist.appendChild(opt);
-        });
-    }
-
-    function autoApplyPrice() {
-      const brand = brandInput.value.trim();
-      const ml = parseFloat(mlSelect.value || 0);
-      if (!brand || !ml) return;
-      const match = PRICELIST.find(x => x.brand === brand && x.ml === ml);
-      priceInput.value = match ? match.price : "";
-    }
-
-    brandInput.addEventListener("input", () => {
-      renderBrandOptions(brandInput.value);
-      autoApplyPrice();
+function renderBrandOptions(filterText) {
+  datalist.innerHTML = "";
+  const q = (filterText || "").toLowerCase();
+  BRANDS.filter(b => b.toLowerCase().includes(q))
+    .slice(0, 30)
+    .forEach(b => {
+      const opt = document.createElement("option");
+      opt.value = b;
+      datalist.appendChild(opt);
     });
-    brandInput.addEventListener("focus", () => renderBrandOptions(brandInput.value));
-    mlSelect.addEventListener("change", autoApplyPrice);
+}
 
-    function money(n) { return (Number(n) || 0).toFixed(2); }
-    function sumField(arr, idx) { return arr.reduce((a, r) => a + (Number(r[idx]) || 0), 0); }
+function autoApplyPrice() {
+  const brand = brandInput.value.trim();
+  const ml    = parseFloat(mlSelect.value || 0);
+  if (!brand || !ml) return;
+  const match = PRICELIST.find(x => x.brand === brand && x.ml === ml);
+  priceInput.value = match ? match.price : "";
+}
 
-    // shared comparator: price first, then brand
-    function compareByPriceThenBrand(a, b) {
-      const priceA = Number(a[5]);
-      const priceB = Number(b[5]);
-      if (priceA !== priceB) return priceA - priceB;
-      const brandA = (a[0] || "").toLowerCase();
-      const brandB = (b[0] || "").toLowerCase();
-      return brandA.localeCompare(brandB);
+brandInput.addEventListener("input", () => {
+  renderBrandOptions(brandInput.value);
+  autoApplyPrice();
+});
+brandInput.addEventListener("focus", () => renderBrandOptions(brandInput.value));
+mlSelect.addEventListener("change", autoApplyPrice);
+
+function money(n) { return (Number(n) || 0).toFixed(2); }
+function sumField(arr, idx) {
+  return arr.reduce((a, r) => a + (Number(r[idx]) || 0), 0);
+}
+
+function compareByPriceThenBrand(a, b) {
+  if (Number(a[5]) !== Number(b[5])) return Number(a[5]) - Number(b[5]);
+  return (a[0]||"").toLowerCase().localeCompare((b[0]||"").toLowerCase());
+}
+function compareObjByPriceThenBrand(x, y) {
+  const ra = x.rec || x.r;
+  const rb = y.rec || y.r;
+  return compareByPriceThenBrand(ra, rb);
+}
+
+const GROUPS = [
+  { key:"180_140",   title:"Table 1: 180 ml (Price <= 140)", filter: r => r[1]===180 && r[5]<=140 },
+  { key:"180_170",   title:"Table 2: 180 ml (Price = 170)",  filter: r => r[1]===180 && r[5]===170 },
+  { key:"180_gt200", title:"Table 3: 180 ml (Price >= 200)", filter: r => r[1]===180 && r[5]>=200 },
+  { key:"375",  title:"Table 4: 375 ml",  filter: r => r[1]===375 },
+  { key:"750",  title:"Table 5: 750 ml",  filter: r => r[1]===750 },
+  { key:"1000", title:"Table 6: 1000 ml", filter: r => r[1]===1000 },
+  { key:"650",  title:"Table 7: 650 ml",  filter: r => r[1]===650 },
+  { key:"500",  title:"Table 8: 500 ml",  filter: r => r[1]===500 },
+];
+
+function renderGroupedTables() {
+  const host = document.getElementById("groups");
+  host.innerHTML = "";
+
+  let t9OB=0,t9CB=0,t9Sales=0,t9SV=0,t9CBV=0;
+  let t10OB=0,t10CB=0,t10Sales=0,t10SV=0,t10CBV=0;
+
+  GROUPS.forEach((g, idx) => {
+    const rows = records.filter(g.filter).slice().sort(compareByPriceThenBrand);
+
+    const totalOB    = sumField(rows, 2);
+    const totalCB    = sumField(rows, 3);
+    const totalSales = sumField(rows, 4);
+    const totalSV    = sumField(rows, 6);
+    const totalCBV   = sumField(rows, 7);
+
+    if (idx >= 0 && idx <= 5) {
+      t9OB+=totalOB; t9CB+=totalCB; t9Sales+=totalSales;
+      t9SV+=totalSV; t9CBV+=totalCBV;
     }
-    function compareObjByPriceThenBrand(x, y) {
-      // x, y are {rec, idx} or {r, idx}
-      const ra = x.rec || x.r;
-      const rb = y.rec || y.r;
-      return compareByPriceThenBrand(ra, rb);
+    if (idx >= 6 && idx <= 7) {
+      t10OB+=totalOB; t10CB+=totalCB; t10Sales+=totalSales;
+      t10SV+=totalSV; t10CBV+=totalCBV;
     }
 
-    const GROUPS = [
-      { key: "180_140",   title: "Table 1: 180 ml (Price <= 140)", filter: r => r[1] === 180 && r[5] <= 140 },
-      { key: "180_170",   title: "Table 2: 180 ml (Price = 170)",  filter: r => r[1] === 180 && r[5] === 170 },
-      { key: "180_gt200", title: "Table 3: 180 ml (Price >= 200)", filter: r => r[1] === 180 && r[5] >= 200 },
-      { key: "375",  title: "Table 4: 375 ml",  filter: r => r[1] === 375 },
-      { key: "750",  title: "Table 5: 750 ml",  filter: r => r[1] === 750 },
-      { key: "1000", title: "Table 6: 1000 ml", filter: r => r[1] === 1000 },
-      { key: "650",  title: "Table 7: 650 ml",  filter: r => r[1] === 650 },
-      { key: "500",  title: "Table 8: 500 ml",  filter: r => r[1] === 500 }
-    ];
+    const title = document.createElement("h2");
+    title.className = "groupTitle";
+    title.textContent = g.title;
+    host.appendChild(title);
 
-    function renderGroupedTables() {
-      const host = document.getElementById("groups");
-      host.innerHTML = "";
-
-      let t9OB = 0, t9CB = 0, t9Sales = 0, t9SV = 0, t9CBV = 0;
-      let t10OB = 0, t10CB = 0, t10Sales = 0, t10SV = 0, t10CBV = 0;
-
-      GROUPS.forEach((g, idx) => {
-        const rows = records
-          .filter(g.filter)
-          .slice()
-          .sort(compareByPriceThenBrand);
-
-        const totalOB = sumField(rows, 2);
-        const totalCB = sumField(rows, 3);
-        const totalSales = sumField(rows, 4);
-        const totalSV = sumField(rows, 6);
-        const totalCBV = sumField(rows, 7);
-
-        if (idx >= 0 && idx <= 5) {
-          t9OB += totalOB; t9CB += totalCB; t9Sales += totalSales; t9SV += totalSV; t9CBV += totalCBV;
-        }
-        if (idx >= 6 && idx <= 7) {
-          t10OB += totalOB; t10CB += totalCB; t10Sales += totalSales; t10SV += totalSV; t10CBV += totalCBV;
-        }
-
-        const title = document.createElement("h2");
-        title.className = "groupTitle";
-        title.textContent = g.title;
-        host.appendChild(title);
-
-        const t = document.createElement("table");
-        t.innerHTML = `
-          <thead>
+    const t = document.createElement("table");
+    t.innerHTML = `
+      <thead>
+        <tr>
+          <th>S.No</th><th>Brand</th><th>ML</th><th>OB</th><th>CB</th>
+          <th>Sales</th><th>Price</th><th>Sales Value</th><th>CB Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.length === 0
+          ? `<tr><td colspan="9" style="text-align:center">No records</td></tr>`
+          : rows.map((r,i) => `
             <tr>
-              <th>S.No</th><th>Brand</th><th>ML</th><th>OB</th><th>CB</th>
-              <th>Sales</th><th>Price</th><th>Sales Value</th><th>CB Value</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${
-              rows.length === 0
-                ? `<tr><td colspan="9" style="text-align:center">No records</td></tr>`
-                : rows.map((r, i) => `
-                  <tr>
-                    <td>${i + 1}</td>
-                    <td>${r[0]}</td>
-                    <td>${r[1]}</td>
-                    <td>${r[2]}</td>
-                    <td>${r[3]}</td>
-                    <td>${r[4]}</td>
-                    <td>${r[5]}</td>
-                    <td>${money(r[6])}</td>
-                    <td>${money(r[7])}</td>
-                  </tr>
-                `).join("")
-            }
-          </tbody>
-        `;
-        host.appendChild(t);
-
-        const totals = document.createElement("table");
-        totals.className = "totalsTable";
-        totals.innerHTML = `
-          <tr>
-            <td>Total OB BOT: ${money(totalOB)}</td>
-            <td>Total CB BOT: ${money(totalCB)}</td>
-            <td>Total Sales BOT: ${money(totalSales)}</td>
-            <td>Total Sales Value: ${money(totalSV)}</td>
-            <td>Total CB Value: ${money(totalCBV)}</td>
-          </tr>
-        `;
-        host.appendChild(totals);
-      });
-
-      const t9Title = document.createElement("h2");
-      t9Title.className = "groupTitle";
-      t9Title.textContent = "(IMFL)";
-      host.appendChild(t9Title);
-
-      const t9Totals = document.createElement("table");
-      t9Totals.className = "totalsTable";
-      t9Totals.innerHTML = `
-        <tr>
-          <td>Total OB BOT: ${money(t9OB)}</td>
-          <td>Total CB BOT: ${money(t9CB)}</td>
-          <td>Total Sales BOT: ${money(t9Sales)}</td>
-          <td>Total Sales Value: ${money(t9SV)}</td>
-          <td>Total CB Value: ${money(t9CBV)}</td>
-        </tr>
-      `;
-      host.appendChild(t9Totals);
-
-      const t10Title = document.createElement("h2");
-      t10Title.className = "groupTitle";
-      t10Title.textContent = "(BEER)";
-      host.appendChild(t10Title);
-
-      const t10Totals = document.createElement("table");
-      t10Totals.className = "totalsTable";
-      t10Totals.innerHTML = `
-        <tr>
-          <td>Total OB BOT: ${money(t10OB)}</td>
-          <td>Total CB BOT: ${money(t10CB)}</td>
-          <td>Total Sales BOT: ${money(t10Sales)}</td>
-          <td>Total Sales Value: ${money(t10SV)}</td>
-          <td>Total CB Value: ${money(t10CBV)}</td>
-        </tr>
-      `;
-      host.appendChild(t10Totals);
-
-      const totalTitle = document.createElement("h2");
-      totalTitle.className = "groupTitle";
-      totalTitle.textContent = "Total(IMFL&BEER)";
-      host.appendChild(totalTitle);
-
-      const totalTable = document.createElement("table");
-      totalTable.className = "totalsTable";
-
-      const totalOB = t9OB + t10OB;
-      const totalCB = t9CB + t10CB;
-      const totalSales = t9Sales + t10Sales;
-      const totalSV = t9SV + t10SV;
-      const totalCBV = t9CBV + t10CBV;
-
-      totalTable.innerHTML = `
-        <tr>
-          <td>Total OB BOT: ${money(totalOB)}</td>
-          <td>Total CB BOT: ${money(totalCB)}</td>
-          <td>Total Sales BOT: ${money(totalSales)}</td>
-          <td>Total Sales Value: ${money(totalSV)}</td>
-          <td>Total CB Value: ${money(totalCBV)}</td>
-        </tr>
-      `;
-      host.appendChild(totalTable);
-    }
-
-    /* --------- EDIT ALL --------- */
-    const editAllBtn = document.getElementById("editAllBtn");
-    const saveAllBtn = document.getElementById("saveAllBtn");
-    let editAllActive = false;
-    let currentEditGroupIndex = null;
-
-    editAllBtn.addEventListener("click", function () {
-      if (editAllActive) {
-        alert("Already in Edit All mode. Click SAVE to finish.");
-        return;
-      }
-
-      renderGroupedTables();
-
-      const host = document.getElementById("groups");
-      const tables = host.querySelectorAll("table");
-
-      tables.forEach(t => {
-        const headerFirstCell = t.querySelector("thead th");
-        if (!headerFirstCell) return;
-        if (headerFirstCell.textContent.trim() !== "S.No") return;
-
-        const rows = t.querySelectorAll("tbody tr");
-        rows.forEach(row => {
-          const cells = row.querySelectorAll("td");
-          if (cells.length < 9) return;
-          const obCell    = cells[3];
-          const salesCell = cells[5];
-          obCell.contentEditable = "true";
-          salesCell.contentEditable = "true";
-          obCell.classList.add("editing");
-          salesCell.classList.add("editing");
-        });
-      });
-
-      editAllActive = true;
-      editAllBtn.style.display = "none";
-      saveAllBtn.style.display = "inline-block";
-    });
-
-    function saveAllFromAllTables() {
-      const host = document.getElementById("groups");
-      const tables = host.querySelectorAll("table");
-
-      GROUPS.forEach((g, groupIndex) => {
-        const groupRows = records
-          .map((rec, idx) => ({ rec, idx }))
-          .filter(x => g.filter(x.rec))
-          .sort(compareObjByPriceThenBrand);
-
-        if (groupRows.length === 0) return;
-
-        const mainTableIndex = groupIndex * 2;
-        const table = tables[mainTableIndex];
-        if (!table) return;
-
-        const bodyRows = table.querySelectorAll("tbody tr");
-        let gi = 0;
-        bodyRows.forEach(rowEl => {
-          const cells = rowEl.querySelectorAll("td");
-          if (cells.length < 9) return;
-
-          const obCell    = cells[3];
-          const cbCell    = cells[4];
-          const salesCell = cells[5];
-          const priceCell = cells[6];
-          const svCell    = cells[7];
-          const cbvCell   = cells[8];
-
-          obCell.contentEditable = "false";
-          salesCell.contentEditable = "false";
-          obCell.classList.remove("editing");
-          salesCell.classList.remove("editing");
-
-          const newOB    = Number(obCell.textContent || 0);
-          const newSales = Number(salesCell.textContent || 0);
-          const price    = Number(priceCell.textContent || 0);
-          const newCB    = newOB - newSales;
-          const newSV    = price * newSales;
-          const newCBV   = price * newCB;
-
-          cbCell.textContent  = money(newCB);
-          svCell.textContent  = money(newSV);
-          cbvCell.textContent = money(newCBV);
-
-          const recIndex = groupRows[gi].idx;
-          const rec = records[recIndex];
-          rec[2] = newOB;
-          rec[4] = newSales;
-          rec[3] = newCB;
-          rec[6] = newSV;
-          rec[7] = newCBV;
-
-          gi++;
-        });
-      });
-
-      saveData();
-      renderGroupedTables();
-
-      editAllActive = false;
-      saveAllBtn.style.display = "none";
-      editAllBtn.style.display = "inline-block";
-    }
-
-    function saveSingleGroup(idx) {
-      const host = document.getElementById("groups");
-      const allTables = host.querySelectorAll("table");
-      const mainTableIndex = idx * 2;
-      const table = allTables[mainTableIndex];
-      if (!table) return;
-      const g = GROUPS[idx];
-
-      const groupRows = records
-        .map((rec, i) => ({ rec, idx: i }))
-        .filter(x => g.filter(x.rec))
-        .sort(compareObjByPriceThenBrand);
-
-      for (let i = 1; i < table.rows.length && i <= groupRows.length; i++) {
-        const rowEl = table.rows[i];
-        const obCell = rowEl.cells[3];
-        const cbCell = rowEl.cells[4];
-        if (!obCell || !cbCell) continue;
-
-        obCell.contentEditable = "false";
-        cbCell.contentEditable = "false";
-        obCell.classList.remove("editing");
-        cbCell.classList.remove("editing");
-
-        const newOB = parseFloat(obCell.textContent || 0);
-        const newCB = parseFloat(cbCell.textContent || 0);
-        const recIndex = groupRows[i - 1].idx;
-        const rec = records[recIndex];
-        rec[2] = newOB;
-        rec[3] = newCB;
-        rec[4] = newOB - newCB;
-        rec[6] = rec[5] * rec[4];
-        rec[7] = rec[5] * rec[3];
-      }
-
-      saveData();
-      renderGroupedTables();
-      currentEditGroupIndex = null;
-      saveAllBtn.style.display = "none";
-      editAllBtn.style.display = "inline-block";
-    }
-
-    saveAllBtn.addEventListener("click", function () {
-      if (editAllActive) {
-        saveAllFromAllTables();
-        return;
-      }
-      if (typeof currentEditGroupIndex === "number") {
-        saveSingleGroup(currentEditGroupIndex);
-      }
-    });
-
-    form.addEventListener("submit", function(e) {
-      e.preventDefault();
-      const brand = brandInput.value.trim();
-      const ml = parseFloat(mlSelect.value || 0);
-      const ob = parseFloat(document.getElementById("ob").value || 0);
-      const cb = parseFloat(document.getElementById("cb").value || 0);
-      const price = parseFloat(priceInput.value || 0);
-      if (!brand || !ml || !price) {
-        alert("Please select Brand + ML. Price will auto-fill. If price is empty, add that brand+ml in PRICELIST.");
-        return;
-      }
-      const sales = ob - cb;
-      const sv = price * sales;
-      const cbv = price * cb;
-
-      const newRecord = [brand, ml, ob, cb, sales, price, sv, cbv];
-      const groupIndex = GROUPS.findIndex(g => g.filter(newRecord));
-      if (groupIndex === -1) {
-        alert("This record doesn't match any table rules.");
-        return;
-      }
-
-      const editIndexStr = localStorage.getItem("editIndex");
-      const isEditing = editIndexStr !== null;
-      const editIndex = isEditing ? parseInt(editIndexStr, 10) : -1;
-
-      if (isEditing) {
-        records[editIndex] = newRecord;
-        localStorage.removeItem("editIndex");
-        alert("Row updated successfully.");
-      } else {
-        const duplicateInSameTable = records.some(r => {
-          const inSameGroup = GROUPS[groupIndex].filter(r);
-          const sameBrand = (r[0] || "").toLowerCase() === brand.toLowerCase();
-          return inSameGroup && sameBrand;
-        });
-        if (duplicateInSameTable) {
-          alert(`"${brand}" already exists in Table ${groupIndex + 1}. Not added.`);
-          return;
+              <td>${i+1}</td>
+              <td>${r[0]}</td>
+              <td>${r[1]}</td>
+              <td>${r[2]}</td>
+              <td>${r[3]}</td>
+              <td>${r[4]}</td>
+              <td>${r[5]}</td>
+              <td>${money(r[6])}</td>
+              <td>${money(r[7])}</td>
+            </tr>`).join("")
         }
-        records.push(newRecord);
-      }
+      </tbody>`;
+    host.appendChild(t);
 
-      saveData();
-      renderGroupedTables();
-      form.reset();
-      brandInput.setAttribute("list", "suggestions");
-      datalist.innerHTML = "";
+    const totals = document.createElement("table");
+    totals.className = "totalsTable";
+    totals.innerHTML = `
+      <tr>
+        <td>Total OB BOT: ${money(totalOB)}</td>
+        <td>Total CB BOT: ${money(totalCB)}</td>
+        <td>Total Sales BOT: ${money(totalSales)}</td>
+        <td>Total Sales Value: ${money(totalSV)}</td>
+        <td>Total CB Value: ${money(totalCBV)}</td>
+      </tr>`;
+    host.appendChild(totals);
+  });
+
+  /* IMSF */
+  const t9Title = document.createElement("h2");
+  t9Title.className = "groupTitle";
+  t9Title.textContent = "(IMSF)";
+  host.appendChild(t9Title);
+  const t9T = document.createElement("table");
+  t9T.className = "totalsTable";
+  t9T.innerHTML = `<tr>
+    <td>Total OB BOT: ${money(t9OB)}</td>
+    <td>Total CB BOT: ${money(t9CB)}</td>
+    <td>Total Sales BOT: ${money(t9Sales)}</td>
+    <td>Total Sales Value: ${money(t9SV)}</td>
+    <td>Total CB Value: ${money(t9CBV)}</td>
+  </tr>`;
+  host.appendChild(t9T);
+
+  /* BEER */
+  const t10Title = document.createElement("h2");
+  t10Title.className = "groupTitle";
+  t10Title.textContent = "(BEER)";
+  host.appendChild(t10Title);
+  const t10T = document.createElement("table");
+  t10T.className = "totalsTable";
+  t10T.innerHTML = `<tr>
+    <td>Total OB BOT: ${money(t10OB)}</td>
+    <td>Total CB BOT: ${money(t10CB)}</td>
+    <td>Total Sales BOT: ${money(t10Sales)}</td>
+    <td>Total Sales Value: ${money(t10SV)}</td>
+    <td>Total CB Value: ${money(t10CBV)}</td>
+  </tr>`;
+  host.appendChild(t10T);
+
+  /* GRAND TOTAL */
+  const grandTitle = document.createElement("h2");
+  grandTitle.className = "groupTitle";
+  grandTitle.textContent = "Total(IMSF&BEER)";
+  host.appendChild(grandTitle);
+  const grandT = document.createElement("table");
+  grandT.className = "totalsTable";
+  grandT.innerHTML = `<tr>
+    <td>Total OB BOT: ${money(t9OB+t10OB)}</td>
+    <td>Total CB BOT: ${money(t9CB+t10CB)}</td>
+    <td>Total Sales BOT: ${money(t9Sales+t10Sales)}</td>
+    <td>Total Sales Value: ${money(t9SV+t10SV)}</td>
+    <td>Total CB Value: ${money(t9CBV+t10CBV)}</td>
+  </tr>`;
+  host.appendChild(grandT);
+}
+
+/* ===== EDIT ALL ===== */
+const editAllBtn = document.getElementById("editAllBtn");
+const saveAllBtn = document.getElementById("saveAllBtn");
+let editAllActive = false;
+let currentEditGroupIndex = null;
+
+editAllBtn.addEventListener("click", function() {
+  if (editAllActive) { alert("Already in Edit All mode. Click SAVE."); return; }
+  renderGroupedTables();
+  const host   = document.getElementById("groups");
+  const tables = host.querySelectorAll("table");
+  tables.forEach(t => {
+    const hdr = t.querySelector("thead th");
+    if (!hdr || hdr.textContent.trim() !== "S.No") return;
+    t.querySelectorAll("tbody tr").forEach(row => {
+      const cells = row.querySelectorAll("td");
+      if (cells.length < 9) return;
+      cells[3].contentEditable = "true"; cells[3].classList.add("editing");
+      cells[5].contentEditable = "true"; cells[5].classList.add("editing");
     });
+  });
+  editAllActive = true;
+  editAllBtn.style.display = "none";
+  saveAllBtn.style.display = "inline-block";
+});
 
-    const eraseBtn = document.getElementById("eraseBtn");
-    const eraseFormDiv = document.getElementById("eraseForm");
-    const eraseSubmit = document.getElementById("eraseSubmit");
-
-    eraseBtn.addEventListener("click", () => {
-      eraseFormDiv.style.display = eraseFormDiv.style.display === "none" ? "block" : "none";
+function saveAllFromAllTables() {
+  const host   = document.getElementById("groups");
+  const tables = host.querySelectorAll("table");
+  GROUPS.forEach((g, groupIndex) => {
+    const groupRows = records.map((rec,idx)=>({rec,idx}))
+      .filter(x=>g.filter(x.rec)).sort(compareObjByPriceThenBrand);
+    if (!groupRows.length) return;
+    const table = tables[groupIndex * 2];
+    if (!table) return;
+    let gi = 0;
+    table.querySelectorAll("tbody tr").forEach(rowEl => {
+      const cells = rowEl.querySelectorAll("td");
+      if (cells.length < 9) return;
+      cells[3].contentEditable="false"; cells[3].classList.remove("editing");
+      cells[5].contentEditable="false"; cells[5].classList.remove("editing");
+      const newOB    = Number(cells[3].textContent||0);
+      const newSales = Number(cells[5].textContent||0);
+      const price    = Number(cells[6].textContent||0);
+      const newCB    = newOB - newSales;
+      cells[4].textContent = money(newCB);
+      cells[7].textContent = money(price*newSales);
+      cells[8].textContent = money(price*newCB);
+      const rec = records[groupRows[gi].idx];
+      rec[2]=newOB; rec[4]=newSales; rec[3]=newCB;
+      rec[6]=price*newSales; rec[7]=price*newCB;
+      gi++;
     });
+  });
+  saveData(); renderGroupedTables();
+  editAllActive=false;
+  saveAllBtn.style.display="none";
+  editAllBtn.style.display="inline-block";
+}
 
-    eraseSubmit.addEventListener("click", () => {
-      const tno = parseInt(document.getElementById("eraseTableNo").value, 10);
-      const rno = parseInt(document.getElementById("eraseRowNo").value, 10);
-      if (!Number.isInteger(tno) || tno < 1 || tno > 8) {
-        alert("Enter table number 1 to 8");
-        return;
-      }
-      if (!Number.isInteger(rno) || rno < 1) {
-        alert("Enter row number N (1,2,3...)");
-        return;
-      }
-      const g = GROUPS[tno - 1];
-      const tableRows = records
-        .map((rec, idx) => ({ rec, idx }))
-        .filter(x => g.filter(x.rec))
-        .sort(compareObjByPriceThenBrand);
-      if (tableRows.length === 0) {
-        alert("No records in this table");
-        return;
-      }
-      if (rno > tableRows.length) {
-        alert(`This table has only ${tableRows.length} rows`);
-        return;
-      }
-      const removeIndex = tableRows[rno - 1].idx;
-      records.splice(removeIndex, 1);
-      saveData();
-      renderGroupedTables();
-      document.getElementById("eraseTableNo").value = "";
-      document.getElementById("eraseRowNo").value = "";
+function saveSingleGroup(idx) {
+  const host   = document.getElementById("groups");
+  const tables = host.querySelectorAll("table");
+  const table  = tables[idx*2];
+  if (!table) return;
+  const g = GROUPS[idx];
+  const groupRows = records.map((rec,i)=>({rec,idx:i}))
+    .filter(x=>g.filter(x.rec)).sort(compareObjByPriceThenBrand);
+  for (let i=1; i<table.rows.length && i<=groupRows.length; i++){
+    const rowEl = table.rows[i];
+    const obCell = rowEl.cells[3];
+    const cbCell = rowEl.cells[4];
+    if (!obCell||!cbCell) continue;
+    obCell.contentEditable="false"; cbCell.contentEditable="false";
+    obCell.classList.remove("editing"); cbCell.classList.remove("editing");
+    const newOB=parseFloat(obCell.textContent||0);
+    const newCB=parseFloat(cbCell.textContent||0);
+    const rec=records[groupRows[i-1].idx];
+    rec[2]=newOB; rec[3]=newCB; rec[4]=newOB-newCB;
+    rec[6]=rec[5]*rec[4]; rec[7]=rec[5]*rec[3];
+  }
+  saveData(); renderGroupedTables();
+  currentEditGroupIndex=null;
+  saveAllBtn.style.display="none";
+  editAllBtn.style.display="inline-block";
+}
+
+saveAllBtn.addEventListener("click", function() {
+  if (editAllActive) { saveAllFromAllTables(); return; }
+  if (typeof currentEditGroupIndex==="number") saveSingleGroup(currentEditGroupIndex);
+});
+
+/* ===== FORM SUBMIT ===== */
+form.addEventListener("submit", function(e) {
+  e.preventDefault();
+  const brand = brandInput.value.trim();
+  const ml    = parseFloat(mlSelect.value||0);
+  const ob    = parseFloat(document.getElementById("ob").value||0);
+  const cb    = parseFloat(document.getElementById("cb").value||0);
+  const price = parseFloat(priceInput.value||0);
+  if (!brand||!ml||!price) {
+    alert("Please select Brand + ML. Price will auto-fill.");
+    return;
+  }
+  const sales=ob-cb, sv=price*sales, cbv=price*cb;
+  const newRecord=[brand,ml,ob,cb,sales,price,sv,cbv];
+  const groupIndex=GROUPS.findIndex(g=>g.filter(newRecord));
+  if (groupIndex===-1){ alert("Doesn't match any table."); return; }
+
+  const editIndexStr=localStorage.getItem("editIndex");
+  if (editIndexStr!==null){
+    records[parseInt(editIndexStr,10)]=newRecord;
+    localStorage.removeItem("editIndex");
+    alert("Row updated.");
+  } else {
+    const dup=records.some(r=>GROUPS[groupIndex].filter(r)&&(r[0]||"").toLowerCase()===brand.toLowerCase());
+    if (dup){ alert(`"${brand}" already exists in Table ${groupIndex+1}.`); return; }
+    records.push(newRecord);
+  }
+  saveData(); renderGroupedTables();
+  form.reset(); datalist.innerHTML="";
+});
+
+/* ===== ERASE ===== */
+document.getElementById("eraseBtn").addEventListener("click",()=>{
+  const ef=document.getElementById("eraseForm");
+  ef.style.display=ef.style.display==="none"?"block":"none";
+});
+document.getElementById("eraseSubmit").addEventListener("click",()=>{
+  const tno=parseInt(document.getElementById("eraseTableNo").value,10);
+  const rno=parseInt(document.getElementById("eraseRowNo").value,10);
+  if (!Number.isInteger(tno)||tno<1||tno>8){ alert("Enter table 1-8"); return; }
+  if (!Number.isInteger(rno)||rno<1){ alert("Enter row number"); return; }
+  const g=GROUPS[tno-1];
+  const tableRows=records.map((rec,idx)=>({rec,idx})).filter(x=>g.filter(x.rec)).sort(compareObjByPriceThenBrand);
+  if (!tableRows.length){ alert("No records in this table"); return; }
+  if (rno>tableRows.length){ alert(`Only ${tableRows.length} rows`); return; }
+  records.splice(tableRows[rno-1].idx,1);
+  saveData(); renderGroupedTables();
+  document.getElementById("eraseTableNo").value="";
+  document.getElementById("eraseRowNo").value="";
+});
+
+/* ===== EDIT SINGLE ===== */
+document.getElementById("muhil").addEventListener("click",function(){
+  const tno=parseInt(prompt("Table Number:"),10);
+  if (!tno) return;
+  const rno=parseInt(prompt("Row Number:"),10);
+  if (!rno) return;
+  if (tno<1||tno>8||rno<1){ alert("Invalid."); return; }
+  const g=GROUPS[tno-1];
+  const gr=records.map((r,idx)=>({r,idx})).filter(o=>g.filter(o.r)).sort((a,b)=>compareByPriceThenBrand(a.r,b.r));
+  if (!gr.length){ alert("No records."); return; }
+  if (rno>gr.length){ alert(`Only ${gr.length} rows.`); return; }
+  const target=gr[rno-1];
+  brandInput.value=target.r[0];
+  mlSelect.value=target.r[1];
+  document.getElementById("ob").value=target.r[2];
+  document.getElementById("cb").value=target.r[3];
+  priceInput.value=target.r[5];
+  localStorage.setItem("editIndex",target.idx);
+  alert("Row loaded. Edit and Submit.");
+});
+
+/* ===== CLEAR ALL ===== */
+function clearAll(){
+  if (!confirm("Clear all records?")) return;
+  const text=prompt('Type "yes" to confirm:');
+  if (!text||text.toLowerCase()!=="yes"){ alert("Cancelled."); return; }
+  records=[];
+  localStorage.removeItem(STORAGEKEY);
+  renderGroupedTables();
+}
+window.clearAll=clearAll;
+
+/* ===== FIREBASE ===== */
+const firebaseConfig={
+  apiKey:"AIzaSyCYBSq_NTLy0lqcL1bXd3iGtjr16fZEvBA",
+  authDomain:"store-45bb2.firebaseapp.com",
+  projectId:"store-45bb2",
+  storageBucket:"store-45bb2.firebasestorage.app",
+  messagingSenderId:"385087942859",
+  appId:"1:385087942859:web:47de5f5375550a26bb6b4e",
+  measurementId:"G-V7PY6W7VND"
+};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth();
+const db=firebase.firestore();
+const provider=new firebase.auth.GoogleAuthProvider();
+let currentUser=null;
+
+auth.onAuthStateChanged(user=>{
+  const status=document.getElementById("userStatus");
+  const loginBtn=document.getElementById("loginBtn");
+  const logoutBtn=document.getElementById("logoutBtn");
+  if(user){
+    currentUser=user;
+    status.textContent="User: "+(user.email||user.uid);
+    loginBtn.style.display="none";
+    logoutBtn.style.display="inline-block";
+  } else {
+    currentUser=null;
+    status.textContent="Not Logged In";
+    loginBtn.style.display="inline-block";
+    logoutBtn.style.display="none";
+  }
+});
+document.getElementById("loginBtn").onclick=()=>auth.signInWithPopup(provider);
+document.getElementById("logoutBtn").onclick=()=>auth.signOut();
+
+/* ===== NEXT DAY ===== */
+document.getElementById("nextDayBtn").onclick=()=>{
+  if(!records.length) return alert("Table is empty.");
+  if(!confirm("Next Day?\nOB = previous CB.")) return;
+  records=records.map(r=>{
+    const oldCB=Number(r[3]||0), price=Number(r[5]||0);
+    return [r[0],r[1],oldCB,oldCB,0,price,0,price*oldCB];
+  });
+  saveData(); renderGroupedTables(); alert("Next day applied.");
+};
+
+/* ===== CLOUD STORE ===== */
+async function storeToCloud(){
+  if(!currentUser) return alert("Please login first.");
+  if(!records.length) return alert("No data to store.");
+  const listName=prompt("Report name:",new Date().toLocaleDateString());
+  if(!listName) return;
+  const data=records.map(r=>({brand:r[0],ml:r[1],ob:r[2],cb:r[3],sales:r[4],price:r[5],sv:r[6],cbv:r[7]}));
+  try {
+    await db.collection("users").doc(currentUser.uid).collection("reports").add({
+      name:listName,data,timestamp:firebase.firestore.FieldValue.serverTimestamp()
     });
+    alert("Saved to cloud.");
+  } catch(e){ console.error(e); alert("Error: "+e.message); }
+}
+document.getElementById("storeCloudBtn").onclick=storeToCloud;
 
-    document.getElementById("muhil").addEventListener("click", function () {
-      const tableNoStr = prompt("Enter Table Number to edit:");
-      if (tableNoStr === null) return;
-      const rowNoStr = prompt("Enter Row Number to edit:");
-      if (rowNoStr === null) return;
-      const tableNo = parseInt(tableNoStr, 10);
-      const rowNo = parseInt(rowNoStr, 10);
-      if (!Number.isInteger(tableNo) || !Number.isInteger(rowNo) || tableNo < 1 || tableNo > 8 || rowNo < 1) {
-        alert("Invalid table or row number.");
-        return;
-      }
-      const groupIndex = tableNo - 1;
-      const g = GROUPS[groupIndex];
-      const groupRecords = records
-        .map((r, idx) => ({ r, idx }))
-        .filter(obj => g.filter(obj.r))
-        .sort((a, b) => compareByPriceThenBrand(a.r, b.r));
-      if (groupRecords.length === 0) {
-        alert("No records in this table.");
-        return;
-      }
-      if (rowNo > groupRecords.length) {
-        alert(`This table has only ${groupRecords.length} rows.`);
-        return;
-      }
-      const target = groupRecords[rowNo - 1];
-      const globalIndex = target.idx;
-      const row = target.r;
-      brandInput.value = row[0];
-      mlSelect.value = row[1];
-      document.getElementById("ob").value = row[2];
-      document.getElementById("cb").value = row[3];
-      priceInput.value = row[5];
-      localStorage.setItem("editIndex", globalIndex);
-      alert("Row loaded. Edit values and press Submit to save.");
+/* ===== CLOUD LIST ===== */
+async function showCloudLists(){
+  if(!currentUser) return alert("Please login first.");
+  const modal=document.getElementById("listModal");
+  const listDiv=document.getElementById("cloudDataList");
+  modal.style.display="block";
+  listDiv.textContent="Loading...";
+  try {
+    const snap=await db.collection("users").doc(currentUser.uid).collection("reports")
+      .orderBy("timestamp","desc").get();
+    listDiv.innerHTML="";
+    if(snap.empty){ listDiv.textContent="No cloud reports found."; return; }
+    snap.forEach(docSnap=>{
+      const d=docSnap.data();
+      const div=document.createElement("div");
+      div.style.margin="8px 0";
+      div.innerHTML=`<strong>${d.name||"(no name)"}</strong> (${(d.data||[]).length} rows)
+        <button onclick="loadCloudReport('${docSnap.id}')">Load</button>`;
+      listDiv.appendChild(div);
     });
+  } catch(e){ console.error(e); listDiv.textContent="Error: "+e.message; }
+}
+document.getElementById("listBtn").onclick=showCloudLists;
 
-    function clearAll() {
-      const ok = confirm("Do you want to clear all records?");
-      if (!ok) return;
-      const text = prompt('Type "yes" to clear all records:');
-      if (text === null) return;
-      if (text.toLowerCase() !== "yes") {
-        alert("Clear cancelled.");
-        return;
-      }
-      records = [];
-      localStorage.removeItem(STORAGEKEY);
-      renderGroupedTables();
-    }
-    window.clearAll = clearAll;
+window.loadCloudReport=async(id)=>{
+  if(!currentUser) return alert("Please login first.");
+  if(!confirm("Overwrite current data?")) return;
+  try {
+    const docSnap=await db.collection("users").doc(currentUser.uid).collection("reports").doc(id).get();
+    if(!docSnap.exists){ alert("Not found."); return; }
+    records=(docSnap.data().data||[]).map(o=>[o.brand,o.ml,o.ob,o.cb,o.sales,o.price,o.sv,o.cbv]);
+    saveData(); renderGroupedTables();
+    document.getElementById("listModal").style.display="none";
+  } catch(e){ console.error(e); alert("Error: "+e.message); }
+};
 
-    /* ---------------- GOOGLE LOGIN + FIRESTORE ---------------- */
-    const firebaseConfig = {
-      apiKey: "AIzaSyCYBSq_NTLy0lqcL1bXd3iGtjr16fZEvBA",
-      authDomain: "store-45bb2.firebaseapp.com",
-      projectId: "store-45bb2",
-      storageBucket: "store-45bb2.firebasestorage.app",
-      messagingSenderId: "385087942859",
-      appId: "1:385087942859:web:47de5f5375550a26bb6b4e",
-      measurementId: "G-V7PY6W7VND"
-    };
+/* ===== INIT ===== */
+loadData();
+renderBrandOptions("");
+renderGroupedTables();
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const provider = new firebase.auth.GoogleAuthProvider();
-
-    let currentUser = null;
-
-    auth.onAuthStateChanged(user => {
-      const status = document.getElementById("userStatus");
-      const loginBtn = document.getElementById("loginBtn");
-      const logoutBtn = document.getElementById("logoutBtn");
-      if (user) {
-        currentUser = user;
-        status.textContent = "User: " + (user.email || user.uid);
-        loginBtn.style.display = "none";
-        logoutBtn.style.display = "inline-block";
-      } else {
-        currentUser = null;
-        status.textContent = "Not Logged In";
-        loginBtn.style.display = "inline-block";
-        logoutBtn.style.display = "none";
-      }
-    });
-
-    document.getElementById("loginBtn").onclick = () => auth.signInWithPopup(provider);
-    document.getElementById("logoutBtn").onclick = () => auth.signOut();
-
-    document.getElementById("nextDayBtn").onclick = () => {
-      if (records.length === 0) return alert("Table is empty.");
-      if (!confirm("Next Day?\nOB = previous CB, CB unchanged, sales recalculated.")) return;
-
-      records = records.map(r => {
-        const brand = r[0];
-        const ml    = r[1];
-        const oldCB = Number(r[3] || 0);
-        const price = Number(r[5] || 0);
-
-        const newOB = oldCB;
-        const newCB = oldCB;
-        const sales = newOB - newCB;
-        const sv    = price * sales;
-        const cbv   = price * newCB;
-
-        return [brand, ml, newOB, newCB, sales, price, sv, cbv];
-      });
-
-      saveData();
-      renderGroupedTables();
-      alert("Next day applied.");
-    };
-
-    async function storeToCloud() {
-      if (!currentUser) return alert("Please login first.");
-      if (records.length === 0) return alert("No data to store.");
-      const listName = prompt("Enter name for this report (e.g. date):", new Date().toLocaleDateString());
-      if (!listName) return;
-      const dataForFirestore = records.map(r => ({
-        brand: r[0],
-        ml: r[1],
-        ob: r[2],
-        cb: r[3],
-        sales: r[4],
-        price: r[5],
-        sv: r[6],
-        cbv: r[7]
-      }));
-      try {
-        await db.collection("users")
-          .doc(currentUser.uid)
-          .collection("reports")
-          .add({
-            name: listName,
-            data: dataForFirestore,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-          });
-        alert("Saved to cloud.");
-      } catch (e) {
-        console.error(e);
-        alert("Error saving: " + e.message);
-      }
-    }
-    document.getElementById("storeCloudBtn").onclick = () => { storeToCloud(); };
-
-    async function showCloudLists() {
-      if (!currentUser) return alert("Please login first.");
-      const modal = document.getElementById("listModal");
-      const listDiv = document.getElementById("cloudDataList");
-      modal.style.display = "block";
-      listDiv.textContent = "Loading...";
-      try {
-        const snap = await db.collection("users")
-          .doc(currentUser.uid)
-          .collection("reports")
-          .orderBy("timestamp", "desc")
-          .get();
-        listDiv.innerHTML = "";
-        if (snap.empty) {
-          listDiv.textContent = "No cloud reports found.";
-          return;
-        }
-        snap.forEach(docSnap => {
-          const d = docSnap.data();
-          const count = (d.data || []).length;
-          const div = document.createElement("div");
-          div.style.margin = "8px 0";
-          div.innerHTML = `<strong>${d.name || "(no name)"}</strong> (${count} rows)
-            <button onclick="loadCloudReport('${docSnap.id}')">Load</button>`;
-          listDiv.appendChild(div);
-        });
-      } catch (e) {
-        console.error(e);
-        listDiv.textContent = "Error: " + e.message;
-      }
-    }
-    document.getElementById("listBtn").onclick = () => { showCloudLists(); };
-
-    window.loadCloudReport = async (id) => {
-      if (!currentUser) return alert("Please login first.");
-      if (!confirm("Overwrite current table with this cloud report?")) return;
-      try {
-        const docSnap = await db.collection("users")
-          .doc(currentUser.uid)
-          .collection("reports")
-          .doc(id)
-          .get();
-        if (!docSnap.exists) {
-          alert("Report not found.");
-          return;
-        }
-        const d = docSnap.data();
-        const recs = d.data || [];
-        records = recs.map(o => [
-          o.brand, o.ml, o.ob, o.cb, o.sales, o.price, o.sv, o.cbv
-        ]);
-        saveData();
-        renderGroupedTables();
-        document.getElementById("listModal").style.display = "none";
-      } catch (e) {
-        console.error(e);
-        alert("Error loading: " + e.message);
-      }
-    };
-
-    loadData();
-    renderBrandOptions("");
-    renderGroupedTables();
-  </script>
+</script>
 </body>
 </html>
