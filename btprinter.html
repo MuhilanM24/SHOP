@@ -365,9 +365,9 @@ function money(n) { return (Number(n) || 0).toFixed(2); }
 // (same ml/price bands, same "price then brand" sort)
 // ════════════════════════════════════════════
 const GROUPS = [
-  { title:"Table 1: 180 ml (Price <= 140)", filter: r => Number(r.ml)===180 && Number(r.price)<=140 },
-  { title:"Table 2: 180 ml (Price = 170)",  filter: r => Number(r.ml)===180 && Number(r.price)===170 },
-  { title:"Table 3: 180 ml (Price >= 200)", filter: r => Number(r.ml)===180 && Number(r.price)>=200 },
+  { title:"Table 1: 180 ml (Price <= 150)", filter: r => Number(r.ml)===180 && Number(r.price)<=150 },
+  { title:"Table 2: 180 ml (Price = 180)",  filter: r => Number(r.ml)===180 && Number(r.price)===180 },
+  { title:"Table 3: 180 ml (Price >= 210)", filter: r => Number(r.ml)===180 && Number(r.price)>=210 },
   { title:"Table 4: 375 ml",  filter: r => Number(r.ml)===375 },
   { title:"Table 5: 750 ml",  filter: r => Number(r.ml)===750 },
   { title:"Table 6: 1000 ml", filter: r => Number(r.ml)===1000 },
