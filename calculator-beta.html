@@ -480,7 +480,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <script>
-    const PRICELIST = [
+    const BASE_PRICELIST = [
 { brand: "Old king xxxx rum", ml: 180, price: 140 },
         { brand: "Old king xxxx rum", ml: 375, price: 280 },
         { brand: "Old king xxxx rum", ml: 750, price: 560 },
@@ -1027,6 +1027,10 @@
            {brand: "Magnus choice vsop bdy", ml: 750, price:680},
         {brand: "British empire ultra pre exclusive beer", ml: 500, price:140},
     ];
+    const PRICELIST = BASE_PRICELIST.map(item => ({
+  ...item,
+  price: item.price + 10
+}));
 
     function printReport() {
       renderGroupedTables();
@@ -1099,16 +1103,16 @@
       return compareByPriceThenBrand(ra, rb);
     }
 
-    const GROUPS = [
-      { key: "180_140",   title: "Table 1: 180 ml (Price <= 140)", filter: r => r[1] === 180 && r[5] <= 140 },
-      { key: "180_170",   title: "Table 2: 180 ml (Price = 170)",  filter: r => r[1] === 180 && r[5] === 170 },
-      { key: "180_gt200", title: "Table 3: 180 ml (Price >= 200)", filter: r => r[1] === 180 && r[5] >= 200 },
-      { key: "375",  title: "Table 4: 375 ml",  filter: r => r[1] === 375 },
-      { key: "750",  title: "Table 5: 750 ml",  filter: r => r[1] === 750 },
-      { key: "1000", title: "Table 6: 1000 ml", filter: r => r[1] === 1000 },
-      { key: "650",  title: "Table 7: 650 ml",  filter: r => r[1] === 650 },
-      { key: "500",  title: "Table 8: 500 ml",  filter: r => r[1] === 500 }
-    ];
+ const GROUPS = [
+  { key:"180_140",   title:"Table 1: 180 ml (Price <= 150)", filter: r => r[1]===180 && r[5]<=150 },
+  { key:"180_170",   title:"Table 2: 180 ml (Price = 180)",  filter: r => r[1]===180 && r[5]===180 },
+  { key:"180_gt200", title:"Table 3: 180 ml (Price >= 210)", filter: r => r[1]===180 && r[5]>=210 },
+  { key:"375",  title:"Table 4: 375 ml",  filter: r => r[1]===375 },
+  { key:"750",  title:"Table 5: 750 ml",  filter: r => r[1]===750 },
+  { key:"1000", title:"Table 6: 1000 ml", filter: r => r[1]===1000 },
+  { key:"650",  title:"Table 7: 650 ml",  filter: r => r[1]===650 },
+  { key:"500",  title:"Table 8: 500 ml",  filter: r => r[1]===500 },
+];
 
     function renderGroupedTables() {
       const host = document.getElementById("groups");
