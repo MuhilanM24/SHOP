@@ -1024,6 +1024,7 @@ const GROUPS = [
   { key:"1000", title:"Table 6: 1000 ml", filter: r => r[1]===1000 },
   { key:"650",  title:"Table 7: 650 ml",  filter: r => r[1]===650 },
   { key:"500",  title:"Table 8: 500 ml",  filter: r => r[1]===500 },
+  { key:"325",  title:"Table 9: 325 ml",  filter: r => r[1]===325 }, 
 ];
 
 function renderGroupedTables() {
@@ -1046,7 +1047,7 @@ function renderGroupedTables() {
       t9OB+=totalOB; t9CB+=totalCB; t9Sales+=totalSales;
       t9SV+=totalSV; t9CBV+=totalCBV;
     }
-    if (idx >= 6 && idx <= 7) {
+    if (idx >= 6 && idx <= 8) {
       t10OB+=totalOB; t10CB+=totalCB; t10Sales+=totalSales;
       t10SV+=totalSV; t10CBV+=totalCBV;
     }
