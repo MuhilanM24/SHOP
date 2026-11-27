@@ -424,8 +424,8 @@
             type="number"
             id="eraseTableNo"
             min="1"
-            max="8"
-            placeholder="Table no (1-8)"
+            max="9"
+            placeholder="Table no (1-9)"
             class="block w-full rounded-2xl border border-slate-600 bg-slate-900/85 px-3.5 py-3 text-sm text-slate-50 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-red-400/90 focus:border-red-400/90 transition" />
         </div>
 
@@ -1490,7 +1490,7 @@
     eraseSubmit.addEventListener("click", () => {
       const tno = parseInt(document.getElementById("eraseTableNo").value, 10);
       const rno = parseInt(document.getElementById("eraseRowNo").value, 10);
-      if (!Number.isInteger(tno) || tno < 1 || tno > 8) {
+      if (!Number.isInteger(tno) || tno < 1 || tno > 9) {
         alert("Enter table number 1 to 8");
         return;
       }
@@ -1526,7 +1526,7 @@
       if (rowNoStr === null) return;
       const tableNo = parseInt(tableNoStr, 10);
       const rowNo = parseInt(rowNoStr, 10);
-      if (!Number.isInteger(tableNo) || !Number.isInteger(rowNo) || tableNo < 1 || tableNo > 8 || rowNo < 1) {
+      if (!Number.isInteger(tableNo) || !Number.isInteger(rowNo) || tableNo < 1 || tableNo > 9 || rowNo < 1) {
         alert("Invalid table or row number.");
         return;
       }
