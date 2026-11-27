@@ -359,7 +359,7 @@ input[type="reset"]:hover  { opacity: 0.75; }
   </button>
   <div id="eraseForm" style="display:none;margin-top:10px;">
     <input type="number" id="eraseTableNo"
-      min="1" max="8" placeholder="Table no (1-8)">
+      min="1" max="9" placeholder="Table no (1-9)">
     <input type="number" id="eraseRowNo"
       min="1" placeholder="Row no (N)">
     <button type="button" id="eraseSubmit" class="muhil">
@@ -1277,7 +1277,7 @@ document.getElementById("eraseBtn").addEventListener("click",()=>{
 document.getElementById("eraseSubmit").addEventListener("click",()=>{
   const tno=parseInt(document.getElementById("eraseTableNo").value,10);
   const rno=parseInt(document.getElementById("eraseRowNo").value,10);
-  if (!Number.isInteger(tno)||tno<1||tno>8){ alert("Enter table 1-8"); return; }
+  if (!Number.isInteger(tno)||tno<1||tno>9){ alert("Enter table 1-9"); return; }
   if (!Number.isInteger(rno)||rno<1){ alert("Enter row number"); return; }
   const g=GROUPS[tno-1];
   const tableRows=records.map((rec,idx)=>({rec,idx})).filter(x=>g.filter(x.rec)).sort(compareObjByPriceThenBrand);
@@ -1295,7 +1295,7 @@ document.getElementById("muhil").addEventListener("click",function(){
   if (!tno) return;
   const rno=parseInt(prompt("Row Number:"),10);
   if (!rno) return;
-  if (tno<1||tno>8||rno<1){ alert("Invalid."); return; }
+  if (tno<1||tno>9||rno<1){ alert("Invalid."); return; }
   const g=GROUPS[tno-1];
   const gr=records.map((r,idx)=>({r,idx})).filter(o=>g.filter(o.r)).sort((a,b)=>compareByPriceThenBrand(a.r,b.r));
   if (!gr.length){ alert("No records."); return; }
