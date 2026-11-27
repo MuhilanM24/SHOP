@@ -376,17 +376,27 @@
       gap: 12px;
       animation: introFade 1.5s ease-in 1.5s forwards;
       pointer-events: none;
-    }
-    .intro-logo {
-      font-size: 28px;
-      opacity: 0;
-      animation: introLogoIn 1s ease-out 0.2s forwards;
-    }
+  .intro-logo {
+  width: clamp(160px, 45vw, 240px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8%;
+  background: radial-gradient(circle, rgba(251,191,36,0.10), rgba(3,0,20,0.9) 70%);
+  border: 2px solid rgba(251,191,36,0.6);
+  box-shadow: 0 0 25px rgba(251,191,36,0.35), inset 0 0 25px rgba(251,191,36,0.15);
+  opacity: 0;
+  animation: introLogoIn 1s ease-out 0.2s forwards;
+}
 
 .intro-logo img {
-  width: clamp(160px, 45vw, 240px);
-  height: auto;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   display: block;
+  border-radius: 50%;
 }
     @keyframes introLogoIn {
       0%{opacity:0;transform:scale(0.5) rotateZ(-90deg);filter:blur(10px);}
@@ -418,7 +428,7 @@
 
     /* NEW: INTRO RING */
     .intro-ring {
-      width: 80px; height: 80px;
+      width: clamp(160px, 45vw, 240px); height: clamp(160px, 45vw, 240px);
       border: 2px solid rgba(251,191,36,0.3);
       border-radius: 50%;
       position: absolute;
@@ -1027,7 +1037,7 @@
   <!-- TOAST -->
   <div class="toast" id="toast" aria-live="polite">
     <span>⌨️</span>
-    <span>Press 1, 2, or 3 to navigate</span>
+    <span>Press 1, 2, 3, or 4 to navigate</span>
   </div>
 
   <!-- CONTENT -->
