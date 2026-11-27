@@ -382,6 +382,12 @@
       opacity: 0;
       animation: introLogoIn 1s ease-out 0.2s forwards;
     }
+    .intro-logo img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  display: block;
+}
     @keyframes introLogoIn {
       0%{opacity:0;transform:scale(0.5) rotateZ(-90deg);filter:blur(10px);}
       100%{opacity:1;transform:scale(1) rotateZ(0);filter:blur(0);}
@@ -964,7 +970,7 @@
   <!-- INTRO -->
   <div class="intro-overlay" aria-hidden="true">
     <div class="intro-ring"></div>
-    <div class="intro-logo">Ⓜ️</div>
+    <div class="intro-logo"><img src="logo.png" alt=""></div>
     <div class="intro-bar"></div>
     <span class="intro-text">Groups Presents</span>
   </div>
