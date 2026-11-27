@@ -373,32 +373,27 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 12px;
+      gap: 20px;
       animation: introFade 1.5s ease-in 1.5s forwards;
       pointer-events: none;
     }
-  .intro-logo {
-  width: clamp(160px, 45vw, 240px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8%;
-  background: radial-gradient(circle, rgba(251,191,36,0.10), rgba(3,0,20,0.9) 70%);
-  border: 2px solid rgba(251,191,36,0.6);
-  box-shadow: 0 0 25px rgba(251,191,36,0.35), inset 0 0 25px rgba(251,191,36,0.15);
-  opacity: 0;
-  animation: introLogoIn 1s ease-out 0.2s forwards;
-}
 
-.intro-logo img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-  border-radius: 50%;
-}
+    /* Circular logo (image is already a circle) */
+    .intro-logo {
+      width: clamp(90px, 26vw, 130px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      opacity: 0;
+      box-shadow: 0 0 35px rgba(251,191,36,0.35);
+      animation: introLogoIn 1s ease-out 0.2s forwards;
+    }
+    .intro-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      border-radius: 50%;
+    }
     @keyframes introLogoIn {
       0%{opacity:0;transform:scale(0.5) rotateZ(-90deg);filter:blur(10px);}
       100%{opacity:1;transform:scale(1) rotateZ(0);filter:blur(0);}
@@ -429,7 +424,7 @@
 
     /* NEW: INTRO RING */
     .intro-ring {
-      width: clamp(160px, 45vw, 240px); height: clamp(160px, 45vw, 240px);
+      width: clamp(90px, 26vw, 130px); height: clamp(90px, 26vw, 130px);
       border: 2px solid rgba(251,191,36,0.3);
       border-radius: 50%;
       position: absolute;
@@ -463,31 +458,32 @@
 
     /* ═══ LOGO ═══ */
     .logo-icon {
-      width: 72px; height: 72px;
+      width: 96px; height: 96px;
       margin: 0 auto 20px;
       position: relative;
       opacity: 0;
       animation: logoReveal 1.2s cubic-bezier(0.16,1,0.3,1) 2s forwards;
     }
+    /* spinning rainbow ring behind the circular logo */
     .logo-icon::before {
       content: '';
       position: absolute; inset: -4px;
-      border-radius: 20px;
+      border-radius: 50%;
       background: conic-gradient(from 0deg, var(--gold), var(--crimson), var(--royal), var(--emerald), var(--gold));
       animation: logoSpin 8s linear infinite;
       opacity: 0.7;
       filter: blur(1px);
     }
-    .logo-icon::after {
-      content: '⚡';
-      position: absolute; inset: 2px;
-      background: var(--bg);
-      border-radius: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 30px;
+    /* the old ⚡ emoji is removed */
+    .logo-icon::after { display: none; }
+    .logo-icon img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
       z-index: 1;
+      background: var(--bg);
     }
     @keyframes logoReveal {
       0%{opacity:0;transform:scale(0.3) rotateZ(-180deg);filter:blur(10px);}
@@ -981,7 +977,7 @@
   <!-- INTRO -->
   <div class="intro-overlay" aria-hidden="true">
     <div class="intro-ring"></div>
-    <div class="intro-logo"><img src="logo.png" alt=""></div>
+    <div class="intro-logo"><img src="logo-circle.png" alt=""></div>
     <div class="intro-bar"></div>
     <span class="intro-text">Groups Presents</span>
   </div>
@@ -1046,7 +1042,7 @@
 
     <div class="greeting" id="greeting"></div>
 
-    <div class="logo-icon" aria-hidden="true"></div>
+    <div class="logo-icon" aria-hidden="true"><img src="logo-circle.png" alt=""></div>
 
     <div class="shop-badge">
       <span class="dot"></span>
@@ -1090,7 +1086,7 @@
           <div class="card-icon"><img src="calculator.jpg" alt="" loading="eager"></div>
           <div class="card-content">
             <div class="card-title">Calculator</div>
-            <div class="card-desc">Quick math & inventory management</div>
+            <div class="card-desc">Quick math &amp; inventory management</div>
           </div>
           <span class="shortcut-hint">1</span>
           <div class="card-arrow">
@@ -1177,6 +1173,12 @@
   </div>
 
   <script>
+    /* INTRO SAFETY: always remove the black overlay */
+    setTimeout(function(){
+      var o = document.querySelector('.intro-overlay');
+      if (o) o.style.display = 'none';
+    }, 3500);
+
     /* GREETING */
     (function(){
       const h=new Date().getHours();
