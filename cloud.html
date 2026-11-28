@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cloud Lists - Shop 2605</title>
+  <link rel="icon" type="image/png" href="logo-circle.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #030014;
+      --card: rgba(12,8,35,0.72);
+      --card-hover: rgba(18,12,50,0.88);
+      --line: rgba(255,255,255,0.08);
+      --text: #f0f0ff;
+      --muted: #8d8bbd;
+      --gold: #fbbf24;
+      --gold-light: #fde68a;
+      --gold-glow: rgba(251,191,36,0.35);
+      --crimson: #e11d48;
+      --emerald: #10b981;
+      --royal: #7c3aed;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse 80% 50% at 15% 10%, rgba(124,58,237,0.14), transparent 55%),
+        radial-gradient(ellipse 60% 60% at 90% 90%, rgba(251,191,36,0.08), transparent 55%),
+        var(--bg);
+      background-attachment: fixed;
+      color: var(--text);
+      font-family: 'Sora', system-ui, sans-serif;
+      padding: 0 16px 40px;
+    }
+
+    .wrap { max-width: 760px; margin: 0 auto; }
+
+    /* ═══ TOP BAR: Back (left) · Login/Logout (right) ═══ */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 0 6px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 16px;
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 9999px;
+      font: 600 13px 'Sora', sans-serif;
+      cursor: pointer;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: transform .2s, border-color .2s, background .2s, box-shadow .2s;
+    }
+    .pill svg { width: 15px; height: 15px; }
+    .pill:hover {
+      border-color: rgba(251,191,36,0.5);
+      box-shadow: 0 0 18px var(--gold-glow);
+    }
+    #backBtn:hover { transform: translateX(-3px); }
+    #loginBtn:hover, #logoutBtn:hover { transform: translateX(3px); }
+    #logoutBtn { display: none; }
+    #logoutBtn:hover { border-color: rgba(225,29,72,0.6); box-shadow: 0 0 18px rgba(225,29,72,0.35); }
+
+    /* ═══ HEADER ═══ */
+    .head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 18px 0 6px;
+    }
+    .logo {
+      width: 54px; height: 54px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: 0 0 22px var(--gold-glow);
+    }
+    .head h1 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: clamp(1.6rem, 6vw, 2.2rem);
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light), var(--gold));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .head p { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 12px 0 14px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .status .dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--muted);
+    }
+    .status.on { color: #bdf7dd; }
+    .status.on .dot { background: var(--emerald); box-shadow: 0 0 10px var(--emerald); }
+
+    /* ═══ LIST ═══ */
+    .list-container {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 6px 18px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .list-item:last-child { border-bottom: none; }
+    .list-info { flex: 1; min-width: 0; }
+    .list-info strong {
+      display: block;
+      font-family: 'Outfit', sans-serif;
+      font-size: 17px;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .list-meta { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+    .list-actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+    .list-actions button {
+      padding: 7px 13px;
+      border-radius: 9999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      font: 600 12px 'Sora', sans-serif;
+      cursor: pointer;
+      transition: transform .15s, background .2s, border-color .2s, color .2s;
+    }
+    .list-actions button:hover { transform: translateY(-2px); }
+    .btn-load   { border-color: rgba(251,191,36,0.5) !important; color: var(--gold) !important; }
+    .btn-load:hover   { background: var(--gold) !important; color: #1a1200 !important; }
+    .btn-rename:hover { border-color: rgba(124,58,237,0.7); background: rgba(124,58,237,0.2); }
+    .btn-delete       { color: #fda4af !important; }
+    .btn-delete:hover { background: var(--crimson) !important; border-color: transparent !important; color: #fff !important; }
+
+    .empty, .hint {
+      text-align: center;
+      padding: 34px 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    button:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+    @media (max-width: 520px) {
+      .list-item { flex-direction: column; align-items: stretch; }
+      .list-actions { justify-content: flex-start; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <button class="pill" id="backBtn" type="button" onclick="location.href='index.html'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/>
+        </svg>
+        Back
+      </button>
+
+      <button class="pill" id="loginBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/>
+        </svg>
+        Login
+      </button>
+      <button class="pill" id="logoutBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>
+        </svg>
+        Logout
+      </button>
+    </div>
+
+    <!-- HEADER -->
+    <div class="head">
+      <img class="logo" src="logo-circle.png" alt="" width="54" height="54">
+      <div>
+        <h1>Cloud Lists</h1>
+        <p>Shop No: 2605</p>
+      </div>
+    </div>
+
+    <div class="status" id="statusBox">
+      <span class="dot"></span>
+      <span id="userStatus">Not Logged In</span>
+    </div>
+
+    <div class="list-container">
+      <div id="cloudDataList" class="hint">Login to see your cloud reports…</div>
+    </div>
+
+  </div>
+
+  <!-- Firebase compat SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    // Same config as calculator.html
+    const firebaseConfig = {
+      apiKey: "AIzaSyCYBSq_NTLy0lqcL1bXd3iGtjr16fZEvBA",
+      authDomain: "store-45bb2.firebaseapp.com",
+      projectId: "store-45bb2",
+      storageBucket: "store-45bb2.firebasestorage.app",
+      messagingSenderId: "385087942859",
+      appId: "1:385087942859:web:47de5f5375550a26bb6b4e",
+      measurementId: "G-V7PY6W7VND"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const provider = new firebase.auth.GoogleAuthProvider();
+
+    let currentUser = null;
+
+    const statusEl = document.getElementById("userStatus");
+    const statusBox = document.getElementById("statusBox");
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const listDiv = document.getElementById("cloudDataList");
+
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, c => (
+        { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+      ));
+    }
+
+    function setList(html, cls) {
+      listDiv.className = cls || "";
+      listDiv.innerHTML = html;
+    }
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        currentUser = user;
+        statusEl.textContent = "Signed in as " + (user.email || user.uid);
+        statusBox.classList.add("on");
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "inline-flex";
+        loadCloudLists();
+      } else {
+        currentUser = null;
+        statusEl.textContent = "Not Logged In";
+        statusBox.classList.remove("on");
+        loginBtn.style.display = "inline-flex";
+        logoutBtn.style.display = "none";
+        setList("Login to see your cloud reports…", "hint");
+      }
+    });
+
+    loginBtn.onclick = () => auth.signInWithPopup(provider);
+    logoutBtn.onclick = () => auth.signOut();
+
+    async function loadCloudLists() {
+      if (!currentUser) return;
+      setList("Loading...", "hint");
+      try {
+        const snap = await db.collection("users")
+          .doc(currentUser.uid)
+          .collection("reports")
+          .orderBy("timestamp", "desc")
+          .get();
+        if (snap.empty) {
+          setList("No cloud reports yet. Save one from the Calculator.", "empty");
+          return;
+        }
+        setList("");
+        snap.forEach(docSnap => {
+          const d = docSnap.data();
+          const id = docSnap.id;
+          const name = d.name || "(no name)";
+          const count = (d.data || []).length;
+          const time = d.timestamp && d.timestamp.toDate
+            ? d.timestamp.toDate().toLocaleString()
+            : "";
+
+          const div = document.createElement("div");
+          div.className = "list-item";
+          div.dataset.id = id;
+          div.dataset.name = name;
+          div.innerHTML = `
+            <div class="list-info">
+              <strong>${esc(name)}</strong>
+              <div class="list-meta">${count} rows${time ? " • " + esc(time) : ""}</div>
+            </div>
+            <div class="list-actions">
+              <button class="btn-load" data-act="load" type="button">Load</button>
+              <button class="btn-rename" data-act="rename" type="button">Rename</button>
+              <button class="btn-delete" data-act="delete" type="button">Delete</button>
+            </div>
+          `;
+          listDiv.appendChild(div);
+        });
+      } catch (e) {
+        console.error(e);
+        setList("Error: " + esc(e.message), "empty");
+      }
+    }
+
+    // One click handler for all Load / Rename / Delete buttons
+    listDiv.addEventListener("click", e => {
+      const btn = e.target.closest("button[data-act]");
+      if (!btn) return;
+      const item = btn.closest(".list-item");
+      const id = item.dataset.id;
+      const name = item.dataset.name;
+      if (btn.dataset.act === "load") loadReportFromCloud(id);
+      if (btn.dataset.act === "rename") renameReport(id, name);
+      if (btn.dataset.act === "delete") deleteReport(id, name);
+    });
+
+    // Load report into localStorage for calculator page to read
+    window.loadReportFromCloud = async function(id) {
+      if (!currentUser) return alert("Please login first.");
+      if (!confirm("Load this report into local storage for calculator?\n(Existing local data will be overwritten)")) return;
+      try {
+        const docSnap = await db.collection("users")
+          .doc(currentUser.uid)
+          .collection("reports")
+          .doc(id)
+          .get();
+        if (!docSnap.exists) {
+          alert("Report not found.");
+          return;
+        }
+        const d = docSnap.data();
+        const recs = d.data || [];
+        localStorage.setItem("calcrecords", JSON.stringify(
+          recs.map(o => [o.brand, o.ml, o.ob, o.cb, o.sales, o.price, o.sv, o.cbv])
+        ));
+        alert("Loaded to local storage.\nOpen Calculator page to see it.");
+      } catch (e) {
+        console.error(e);
+        alert("Error loading: " + e.message);
+      }
+    };
+
+    // Rename: change "name" field of the document
+    window.renameReport = async function(id, oldName) {
+      if (!currentUser) return alert("Please login first.");
+      const newName = prompt("Enter new name for this report:", oldName);
+      if (!newName) return;
+      try {
+        await db.collection("users")
+          .doc(currentUser.uid)
+          .collection("reports")
+          .doc(id)
+          .update({ name: newName });
+        alert("Renamed.");
+        loadCloudLists();
+      } catch (e) {
+        console.error(e);
+        alert("Error renaming: " + e.message);
+      }
+    };
+
+    // Delete: require typing "yes" and then remove document from Firestore
+    window.deleteReport = async function(id, name) {
+      if (!currentUser) return alert("Please login first.");
+
+      const text = prompt(`Type "yes" to delete report "${name}" permanently:`);
+      if (text === null) return; // cancelled
+      if (text.toLowerCase() !== "yes") {
+        alert("Delete cancelled.");
+        return;
+      }
+
+      try {
+        await db.collection("users")
+          .doc(currentUser.uid)
+          .collection("reports")
+          .doc(id)
+          .delete();
+        alert("Deleted.");
+        loadCloudLists();
+      } catch (e) {
+        console.error(e);
+        alert("Error deleting: " + e.message);
+      }
+    };
+  </script>
+</body>
+</html>
