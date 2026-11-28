@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <title>BT Printer - Shop 2605</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="logo-circle.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -209,7 +210,7 @@ let selectedRows = [];   // [{brand, ml, ob, cb, sales}]
 let selectedName = '';
 
 // ════════════════════════════════════════════
-// TOAST
+// TOAST (errors stay longer so you can read them)
 // ════════════════════════════════════════════
 let toastTimer;
 function showToast(msg, type='info') {
@@ -217,7 +218,7 @@ function showToast(msg, type='info') {
   t.textContent = msg;
   t.className = 'toast show ' + type;
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=> t.className='toast', 3200);
+  toastTimer = setTimeout(()=> t.className='toast', type === 'error' ? 8000 : 3200);
 }
 
 // ════════════════════════════════════════════
@@ -279,7 +280,7 @@ async function loadReports() {
     }
 
     sel.innerHTML = '<option value="">Select a report…</option>' +
-      allReports.map((r,i) => `<option value="${i}">${r.name}${r.ts ? ' — ' + r.ts.toLocaleDateString() : ''} (${r.data.length} rows)</option>`).join('');
+      allReports.map((r,i) => `<option value="${i}">${escapeHtml(String(r.name))}${r.ts ? ' — ' + r.ts.toLocaleDateString() : ''} (${r.data.length} rows)</option>`).join('');
   } catch (e) {
     sel.innerHTML = '<option value="">Error loading reports</option>';
     showToast('Error: ' + e.message, 'error');
@@ -361,8 +362,9 @@ function fmtPrice(n) { return String(Number(n) || 0); }
 function money(n) { return (Number(n) || 0).toFixed(2); }
 
 // ════════════════════════════════════════════
-// GROUP + SORT — mirrors calculator.html's 8 tables
+// GROUP + SORT — mirrors calculator.html's 9 tables
 // (same ml/price bands, same "price then brand" sort)
+// Tables 1-6 = IMFL, Tables 7-9 = Beer
 // ════════════════════════════════════════════
 const GROUPS = [
   { title:"Table 1: 180 ml (Price <= 150)", filter: r => Number(r.ml)===180 && Number(r.price)<=150 },
@@ -373,6 +375,7 @@ const GROUPS = [
   { title:"Table 6: 1000 ml", filter: r => Number(r.ml)===1000 },
   { title:"Table 7: 650 ml",  filter: r => Number(r.ml)===650 },
   { title:"Table 8: 500 ml",  filter: r => Number(r.ml)===500 },
+  { title:"Table 9: 325 ml",  filter: r => Number(r.ml)===325 },
 ];
 
 function compareByPriceThenBrand(a, b) {
@@ -387,20 +390,20 @@ function groupLikeCalculator(rows) {
     matched.forEach(r => used.add(r));
     return { title: g.title, rows: matched.slice().sort(compareByPriceThenBrand) };
   });
-  // Anything that doesn't fall into one of the 8 tables (e.g. unusual ml) still gets printed
+  // Anything that doesn't fall into one of the 9 tables (e.g. unusual ml) still gets printed
   const leftover = rows.filter(r => !used.has(r)).slice().sort(compareByPriceThenBrand);
   if (leftover.length) groups.push({ title: 'Other', rows: leftover });
   return groups;
 }
 
-// Grand total across Tables 1-6 (IMFL) + Tables 7-8 (Beer) — same as
+// Grand total across Tables 1-6 (IMFL) + Tables 7-9 (Beer) — same as
 // calculator.html's "Total(IMFL&BEER)" row.
 function sumOf(rows, field) {
   return rows.reduce((a, r) => a + (Number(r[field]) || 0), 0);
 }
 function computeImflBeerTotal(groups) {
   const imflGroups = groups.slice(0, 6);   // Table 1-6
-  const beerGroups  = groups.slice(6, 8);  // Table 7-8
+  const beerGroups  = groups.slice(6, 9);  // Table 7-9 (650, 500, 325 ml)
   const imflRows = imflGroups.flatMap(g => g.rows);
   const beerRows  = beerGroups.flatMap(g => g.rows);
   const combine = rows => ({
@@ -465,6 +468,16 @@ function updatePrintAvailability() {
   document.getElementById('printBtn').disabled = !(btCharacteristic && selectedRows.length);
 }
 
+// Linux often fails the first connect attempt - try a few times
+async function connectWithRetry(device, tries) {
+  let lastErr;
+  for (let i = 0; i < tries; i++) {
+    try { return await device.gatt.connect(); }
+    catch (e) { lastErr = e; await new Promise(r => setTimeout(r, 800)); }
+  }
+  throw lastErr;
+}
+
 document.getElementById('connectBtn').onclick = async () => {
   if (!navigator.bluetooth) {
     showToast('Web Bluetooth is not supported in this browser.', 'error');
@@ -474,30 +487,26 @@ document.getElementById('connectBtn').onclick = async () => {
   const chrUuid = document.getElementById('charUuid').value.trim();
   try {
     setBtStatus(false, 'Requesting device…');
+    // Show every nearby device (many printers don't advertise their service UUID)
     btDevice = await navigator.bluetooth.requestDevice({
-      filters: [{ services: [svcUuid] }],
+      acceptAllDevices: true,
       optionalServices: [svcUuid]
-    }).catch(async () => {
-      // fall back to letting the user pick any nearby device
-      return navigator.bluetooth.requestDevice({
-        acceptAllDevices: true,
-        optionalServices: [svcUuid]
-      });
     });
 
     setBtStatus(false, 'Connecting…');
-    btDevice.addEventListener('gattserverdisconnected', () => {
+    btDevice.ongattserverdisconnected = () => {
       btCharacteristic = null;
       setBtStatus(false, 'Disconnected');
-    });
+    };
 
-    const server = await btDevice.gatt.connect();
+    const server = await connectWithRetry(btDevice, 3);
     const service = await server.getPrimaryService(svcUuid);
     btCharacteristic = await service.getCharacteristic(chrUuid);
 
     setBtStatus(true, 'Connected: ' + (btDevice.name || 'BT Printer'));
     showToast('Printer connected ✅', 'success');
   } catch (e) {
+    console.error(e);
     setBtStatus(false, 'Not connected');
     showToast('Bluetooth error: ' + e.message, 'error');
   }
